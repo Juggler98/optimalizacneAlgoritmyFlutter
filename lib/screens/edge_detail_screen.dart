@@ -31,6 +31,35 @@ class EdgeDetailScreen extends StatelessWidget {
               // );
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.delete_forever),
+            tooltip: 'Vymaž',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Vymazať'),
+                  content: const Text('Určite chceš vymazať túto hranu?'),
+                  actions: [
+                    TextButton(
+                      child: const Text('Nie'),
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                      },
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                        app.removeEdge(edge);
+                      },
+                      child: const Text('Vymazať'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: Center(

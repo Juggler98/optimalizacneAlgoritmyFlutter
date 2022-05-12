@@ -28,8 +28,6 @@ class _GraphScreenState extends State<GraphScreen> {
   void initState() {
     super.initState();
 
-    print('GraphScreen');
-
     // final a = Node.Id(1);
     // final b = Node.Id(2);
     // final c = Node.Id(3);
@@ -52,18 +50,22 @@ class _GraphScreenState extends State<GraphScreen> {
 
     List<Node> graphicsNodes = [];
     for (int i = 0; i < app.uzly.length; i++) {
-      graphicsNodes.add(Node.Id(app.uzly[i].id + 1));
+      graphicsNodes.add(Node.Id(app.uzly[i].id));
     }
     graph.addNodes(graphicsNodes);
+
     for (int i = 0; i < app.uzly.length; i++) {
-      Hrana? nodeEdge = app.uzly[i].edge;
+      final node = app.uzly[i];
+      Hrana? nodeEdge = node.edge;
       while (nodeEdge != null) {
-        graph.addEdge(graphicsNodes[nodeEdge.from], graphicsNodes[nodeEdge.to]);
-        nodeEdge = nodeEdge.getNextEdge(i);
+        final node1 = graphicsNodes.firstWhere((element) => (element.key!.value as int?) == nodeEdge?.from);
+        final node2 = graphicsNodes.firstWhere((element) => (element.key!.value as int?) == nodeEdge?.to);
+        graph.addEdge(node1, node2);
+        nodeEdge = nodeEdge.getNextEdge(node.id);
       }
     }
     setState(() {
-      builder = FruchtermanReingoldAlgorithm(iterations: 1);
+      builder = FruchtermanReingoldAlgorithm(iterations: 1000);
     });
 
   }

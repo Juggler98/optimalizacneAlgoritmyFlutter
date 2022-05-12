@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/screens/edge_detail_screen.dart';
 import '../models/edge.dart';
@@ -10,7 +12,7 @@ class EdgeItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 80.0, vertical: 0),
+      padding: EdgeInsets.symmetric(horizontal: Platform.isWindows ? 80.0 : 16.0, vertical: 0),
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(

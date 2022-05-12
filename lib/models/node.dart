@@ -19,4 +19,13 @@ class Uzol {
     this.lat,
     this.lon,
   });
+
+  void vypis() {
+    print("Node{" +
+        "id=" + id.toString() +
+        ", lat=" + lat.toString() +
+        ", lon=" + lon.toString() +
+        ", edge=" + edge.toString() +
+        '}');
+  }
 }

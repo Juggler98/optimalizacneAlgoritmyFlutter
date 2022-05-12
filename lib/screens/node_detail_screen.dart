@@ -1,13 +1,17 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:optimalizacne_algoritmy/application.dart';
 
+import '../models/edge.dart';
 import '../models/node.dart';
 
 class NodeDetailScreen extends StatelessWidget {
   final Uzol node;
 
-  const NodeDetailScreen({required this.node, Key? key}) : super(key: key);
+  NodeDetailScreen({required this.node, Key? key}) : super(key: key);
+
+  final app = Application();
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +28,35 @@ class NodeDetailScreen extends StatelessWidget {
               //     builder: (ctx) => NewLogScreen(stone: stone),
               //   ),
               // );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_forever),
+            tooltip: 'Vymaž',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Vymazať'),
+                  content: const Text('Určite chceš vymazať tento uzol?'),
+                  actions: [
+                    TextButton(
+                      child: const Text('Nie'),
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                      },
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                        app.removeNode(node);
+                      },
+                      child: const Text('Vymazať'),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
         ],
@@ -55,11 +88,14 @@ class NodeDetailScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text('ID: ${node.id.toString()}'),
                     const SizedBox(height: 8),
-                    Text('Názov: ${node.name != null ? node.name.toString() : ''}'),
+                    Text(
+                        'Názov: ${node.name != null ? node.name.toString() : ''}'),
                     const SizedBox(height: 8),
-                    Text('Typ: ${node.type != null ? node.type.toString() : ''}'),
+                    Text(
+                        'Typ: ${node.type != null ? node.type.toString() : ''}'),
                     const SizedBox(height: 8),
-                    Text('Kapacita: ${node.capacity != null ? node.capacity.toString() : ''}'),
+                    Text(
+                        'Kapacita: ${node.capacity != null ? node.capacity.toString() : ''}'),
                     const SizedBox(height: 8),
                     Text((node.lat != null
                             ? ' X: ${node.lon.toString()}'
