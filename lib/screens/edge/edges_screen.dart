@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/widgets/node_item.dart';
 import 'package:provider/provider.dart';
 
-import '../application.dart';
+import '../../application.dart';
+import '../../widgets/edge_item.dart';
 
-class NodesScreen extends StatefulWidget {
-  const NodesScreen({Key? key}) : super(key: key);
+class EdgesScreen extends StatefulWidget {
+  const EdgesScreen({Key? key}) : super(key: key);
 
   @override
-  _NodesScreenState createState() => _NodesScreenState();
+  _EdgesScreenState createState() => _EdgesScreenState();
 }
 
-class _NodesScreenState extends State<NodesScreen> {
+class _EdgesScreenState extends State<EdgesScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,7 @@ class _NodesScreenState extends State<NodesScreen> {
               builder: (ctx, app, _) => Container(
                 child: app.loading
                     ? const Center(child: CircularProgressIndicator())
-                    : app.uzly.isEmpty
+                    : app.hrany.isEmpty
                         ? Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Center(
@@ -35,9 +36,9 @@ class _NodesScreenState extends State<NodesScreen> {
                             ),
                           )
                         : ListView.builder(
-                            itemCount: app.uzly.length,
+                            itemCount: app.hrany.length,
                             itemBuilder: (ctx, index) {
-                              return NodeItem(node: app.uzly.elementAt(index));
+                              return EdgeItem(edge: app.hrany.elementAt(index));
                             },
                           ),
               ),

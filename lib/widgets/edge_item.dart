@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:optimalizacne_algoritmy/screens/edge_detail_screen.dart';
+import 'package:optimalizacne_algoritmy/screens/edge/edge_detail_screen.dart';
 import '../models/edge.dart';
 
 class EdgeItem extends StatelessWidget {

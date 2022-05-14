@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '../application.dart';
-import '../models/edge.dart';
-import '../models/node.dart';
-import 'node_detail_screen.dart';
+import '../../application.dart';
+import '../../models/edge.dart';
+import '../../models/node.dart';
+import '../node/node_detail_screen.dart';
 
 class EdgeDetailScreen extends StatelessWidget {
   final Hrana edge;

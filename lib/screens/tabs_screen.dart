@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:optimalizacne_algoritmy/screens/edges_screen.dart';
+import 'package:optimalizacne_algoritmy/screens/edge/edges_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/graph_screen.dart';
-import 'package:optimalizacne_algoritmy/screens/nodes_screen.dart';
+import 'package:optimalizacne_algoritmy/screens/node/nodes_screen.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({Key? key}) : super(key: key);

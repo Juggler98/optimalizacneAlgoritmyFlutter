@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/application.dart';
 
-import '../models/edge.dart';
-import '../models/node.dart';
+import '../../models/node.dart';
 
 class NodeDetailScreen extends StatelessWidget {
   final Uzol node;
