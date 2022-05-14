@@ -31,7 +31,8 @@ class Application with ChangeNotifier {
     "SR_nodes.vec",
   };
 
-  var _nodesCount = -1;
+  var nodesCount = -1;
+  var edgesCount = 1;
   List<Uzol> uzly = [];
   List<Hrana> hrany = [];
 
@@ -79,19 +80,19 @@ class Application with ChangeNotifier {
 
     bool startsFromZero = false;
     for (var line in scNodesLines) {
-      if (_nodesCount == 0) {
+      if (nodesCount == 0) {
         startsFromZero = true;
       }
-      _nodesCount = int.parse(line);
+      nodesCount = int.parse(line);
       //print(_nodesCount);
     }
 
     if (startsFromZero) {
-      _nodesCount++;
+      nodesCount++;
     }
-    print("Pocet vrcholov: " + _nodesCount.toString());
+    print("Pocet vrcholov: " + nodesCount.toString());
 
-    for (int i = 0; i < _nodesCount; i++) {
+    for (int i = 0; i < nodesCount; i++) {
       uzly.add(Uzol(id: i));
     }
 
@@ -114,7 +115,6 @@ class Application with ChangeNotifier {
     /*
          * Inicializacia dynamickej doprednej hviezdy
         */
-
     for (int i = 0; i < scEdgesIncLines.length; i++) {
       var line = scEdgesIncLines.elementAt(i);
       var data = intInStr.allMatches(line);
@@ -136,6 +136,7 @@ class Application with ChangeNotifier {
       }
       Hrana edge = Hrana(id: id, from: from, to: to, length: length);
       hrany.add(edge);
+      edgesCount++;
 
       Hrana? nodeFromEdge = uzly[from].edge;
       if (nodeFromEdge == null) {
@@ -172,7 +173,7 @@ class Application with ChangeNotifier {
     //vypisHranyPreVrcholy(-1);
   }
 
-  void reload() {
+  void _reload() {
     loading = true;
     notifyListeners();
 
@@ -241,17 +242,29 @@ class Application with ChangeNotifier {
       hrany.removeWhere((element) => element.id == nodeEdge?.id);
       nodeEdge = nodeEdge.getNextEdge(node.id);
     }
-    reload();
+    _reload();
   }
 
   void removeEdge(Hrana edge) {
     hrany.removeWhere((element) => element.id == edge.id);
-    reload();
+    _reload();
+  }
+
+  void addNode(Uzol node) {
+    uzly.add(node);
+    nodesCount++;
+    _reload();
+  }
+
+  void addEdge(Hrana edge) {
+    hrany.add(edge);
+    edgesCount++;
+    _reload();
   }
 
   void vypisHranyPreVrcholy(int pocet) {
     if (pocet == -1) {
-      pocet = _nodesCount;
+      pocet = nodesCount;
     }
     for (int i = 0; i < pocet; i++) {
       print("NODE: " + i.toString());

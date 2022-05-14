@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:optimalizacne_algoritmy/screens/edge/edge_new_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/edge/edges_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/graph_screen.dart';
+import 'package:optimalizacne_algoritmy/screens/node/node_new_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/node/nodes_screen.dart';
 
 class TabsScreen extends StatefulWidget {
@@ -77,7 +79,46 @@ class _TabsScreenState extends State<TabsScreen>
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _selectedPageIndex != 1 ? null : null,
+      floatingActionButton: _selectedPageIndex == 0 ||  _selectedPageIndex == 1 ? FloatingActionButton(
+        tooltip: 'Vytvor',
+        backgroundColor: Colors.blueAccent,
+        child: const Icon(Icons.add, color: Colors.white),
+        onPressed: () {
+          showModalBottomSheet(
+              context: context,
+              builder: (context) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    ListTile(
+                      leading: const Icon(Icons.crop_square),
+                      title: const Text('Nový uzol'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) => const NodeNewScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.linear_scale),
+                      title: const Text('Nová hrana'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (ctx) => const EdgeNewScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              });
+        },
+      ) : null,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         onTap: _selectPage,
