@@ -1,6 +1,8 @@
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:optimalizacne_algoritmy/models/twoThreeTree/two_three_tree.dart';
 import 'package:optimalizacne_algoritmy/models/typ_uzla.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -34,8 +36,9 @@ class Application with ChangeNotifier {
 
   var nodesCount = -1;
   var edgesCount = 1;
-  List<Uzol> uzly = [];
-  List<Hrana> hrany = [];
+
+  final TTTree<num, Node> _nodesTree = TTTree();
+  final TTTree<num, Edge> _edgesTree = TTTree();
 
   var loading = true;
 
@@ -91,10 +94,12 @@ class Application with ChangeNotifier {
     if (startsFromZero) {
       nodesCount++;
     }
-    print("Pocet vrcholov: " + nodesCount.toString());
+    if (kDebugMode) {
+      print("Pocet vrcholov: " + nodesCount.toString());
+    }
 
     for (int i = 0; i < nodesCount; i++) {
-      uzly.add(Uzol(id: i));
+      _nodesTree.add(Node(id: i));
     }
 
     final intInStr = RegExp(r'\d+\.?\d*');
@@ -109,8 +114,9 @@ class Application with ChangeNotifier {
       double lon = double.parse(data2.first.group(0).toString());
       double lat = double.parse(data2.elementAt(1).group(0).toString());
 
-      uzly[id].lat = lat;
-      uzly[id].lon = lon;
+      final uzol = _nodesTree.search(Node(id: id));
+      uzol.lat = lat;
+      uzol.lon = lon;
     }
 
     /*
@@ -135,157 +141,232 @@ class Application with ChangeNotifier {
       if (from == to) {
         continue;
       }
-      Hrana edge = Hrana(id: id, from: from, to: to, length: length);
-      hrany.add(edge);
+      Edge edge = Edge(id: id, from: from, to: to, length: length);
+      _edgesTree.add(edge);
       edgesCount++;
 
-      Hrana? nodeFromEdge = uzly[from].edge;
-      if (nodeFromEdge == null) {
-        uzly[from].edge = edge;
-      } else {
-        while (true) {
-          if (nodeFromEdge?.getNextEdge(from) == null) {
-            nodeFromEdge?.setNextEdge(from, edge);
-            break;
-          }
-          nodeFromEdge = nodeFromEdge?.getNextEdge(from);
-        }
-      }
-
-      Hrana? nodeToEdge = uzly[to].edge;
-      if (nodeToEdge == null) {
-        uzly[to].edge = edge;
-      } else {
-        while (true) {
-          if (nodeToEdge?.getNextEdge(to) == null) {
-            nodeToEdge?.setNextEdge(to, edge);
-            break;
-          }
-          nodeToEdge = nodeToEdge?.getNextEdge(to);
-        }
-      }
+      _initDoprednaHviezda(edge);
     }
 
-    print("Pocet hran: " + hrany.length.toString());
+    if (kDebugMode) {
+      print("Pocet hran: " + _edgesTree.getSize().toString());
+    }
 
     loading = false;
     notifyListeners();
 
-    vypisHranyPreVrcholy(-1);
+    //vypisHranyPreVrcholy(-1);
+
+    //_hrany.clear();
+    //_uzly.clear();
+
+    //printDistance(1, 6, false);
   }
 
   void _reload() {
     loading = true;
     notifyListeners();
 
-    List<Uzol> uzly = [];
-    List<Hrana> hrany = [];
-    for (var uzol in this.uzly) {
-      uzly.add(Uzol(
-        id: uzol.id,
-        name: uzol.name,
-        type: uzol.type,
-        capacity: uzol.capacity,
-        lat: uzol.lat,
-        lon: uzol.lon,
-      ));
+    for (var uzol in _nodesTree.getInOrderData()) {
+      uzol.edge = null;
     }
 
-    for (var hrana in this.hrany) {
-      hrany.add(Hrana(
-        id: hrana.id,
-        from: hrana.from,
-        to: hrana.to,
-        length: hrana.length,
-      ));
+    final hrany = _edgesTree.getInOrderData();
+
+    for (var hrana in hrany) {
+      hrana.nextEdgeFrom = null;
+      hrana.nextEdgeTo = null;
     }
 
     for (var hrana in hrany) {
-      var node = uzly.firstWhere((element) => element.id == hrana.from);
-      Hrana? nodeFromEdge = node.edge;
-      if (nodeFromEdge == null) {
-        node.edge = hrana;
-      } else {
-        while (true) {
-          if (nodeFromEdge?.getNextEdge(hrana.from) == null) {
-            nodeFromEdge?.setNextEdge(hrana.from, hrana);
-            break;
-          }
-          nodeFromEdge = nodeFromEdge?.getNextEdge(hrana.from);
-        }
-      }
-
-      node = uzly.firstWhere((element) => element.id == hrana.to);
-      Hrana? nodeToEdge = node.edge;
-      if (nodeToEdge == null) {
-        node.edge = hrana;
-      } else {
-        while (true) {
-          if (nodeToEdge?.getNextEdge(hrana.to) == null) {
-            nodeToEdge?.setNextEdge(hrana.to, hrana);
-            break;
-          }
-          nodeToEdge = nodeToEdge?.getNextEdge(hrana.to);
-        }
-      }
+      _initDoprednaHviezda(hrana);
     }
-    this.uzly = uzly;
-    this.hrany = hrany;
 
     loading = false;
     notifyListeners();
   }
 
-  void removeNode(Uzol node) {
-    uzly.removeWhere((element) => element.id == node.id);
-    Hrana? nodeEdge = node.edge;
+  void _initDoprednaHviezda(Edge edge) {
+    var node = _nodesTree.search(Node(id: edge.from));
+    Edge nodeFromEdge = node.edge;
+    if (nodeFromEdge == null) {
+      node.edge = edge;
+    } else {
+      while (true) {
+        if (nodeFromEdge?.getNextEdge(edge.from) == null) {
+          nodeFromEdge?.setNextEdge(edge.from, edge);
+          break;
+        }
+        nodeFromEdge = nodeFromEdge?.getNextEdge(edge.from);
+      }
+    }
+
+    node = _nodesTree.search(Node(id: edge.to));
+    Edge nodeToEdge = node.edge;
+    if (nodeToEdge == null) {
+      node.edge = edge;
+    } else {
+      while (true) {
+        if (nodeToEdge?.getNextEdge(edge.to) == null) {
+          nodeToEdge?.setNextEdge(edge.to, edge);
+          break;
+        }
+        nodeToEdge = nodeToEdge?.getNextEdge(edge.to);
+      }
+    }
+  }
+
+  void removeNode(Node node) {
+    _nodesTree.remove(node);
+    Edge nodeEdge = node.edge;
     while (nodeEdge != null) {
-      hrany.removeWhere((element) => element.id == nodeEdge?.id);
+      _edgesTree.remove(nodeEdge);
       nodeEdge = nodeEdge.getNextEdge(node.id);
     }
     _reload();
   }
 
-  void removeEdge(Hrana edge) {
-    hrany.removeWhere((element) => element.id == edge.id);
+  void removeEdge(Edge edge) {
+    _edgesTree.remove(edge);
     _reload();
   }
 
-  void addNode(Uzol node) {
-    uzly.add(node);
+  void addNode(Node node) {
+    _nodesTree.add(node);
     nodesCount++;
     notifyListeners();
   }
 
-  void addEdge(Hrana edge) {
-    hrany.add(edge);
+  void addEdge(Edge edge) {
+    _edgesTree.add(edge);
     edgesCount++;
     _reload();
   }
 
-  void editNode(Uzol node, String? name, double? capacity, NodeType type) {
+  void editNode(Node node, String name, double capacity, NodeType type) {
     node.name = name;
     node.capacity = capacity;
     node.type = type;
     notifyListeners();
   }
 
-  void editEdge(Hrana edge, double? length, bool active) {
+  void editEdge(Edge edge, double length, bool active) {
     edge.length = length ?? 0;
     edge.active = active;
     notifyListeners();
+  }
+
+  Node getNode(int id) {
+    return _nodesTree.search(Node(id: id));
+  }
+
+  Edge getEdge(int id) {
+    return _edgesTree.search(Edge(id: id, from: -1, to: -1));
+  }
+
+  List<Node> get allNodes {
+    return _nodesTree.getInOrderData();
+  }
+
+  List<Edge> get allEdges {
+    return _edgesTree.getInOrderData();
+  }
+
+  List<Node> getIntervalNodes(int start, int end) {
+    return _nodesTree.getIntervalData(Node(id: start), Node(id: end));
+  }
+
+  bool get isEdgesTreeEmpty {
+    return _edgesTree.getSize() == 0;
+  }
+
+  bool get isNodesTreeEmpty {
+    return _nodesTree.getSize() == 0;
   }
 
   void vypisHranyPreVrcholy(int pocet) {
     if (pocet == -1) {
       pocet = nodesCount;
     }
-    for (int i = 0; i < pocet; i++) {
-      print("NODE: " + i.toString());
-      Hrana? nodeEdge = uzly[i].edge;
+
+    var count = 0;
+    for (var uzol in _nodesTree.getIntervalData(Node(id: 0), Node(id: pocet))) {
+      count++;
+      if (kDebugMode) {
+        print("NODE: " + count.toString());
+      }
+      Edge nodeEdge = uzol.edge;
       while (nodeEdge != null) {
         nodeEdge.vypis();
-        nodeEdge = nodeEdge.getNextEdge(i);
+        nodeEdge = nodeEdge.getNextEdge(uzol.id);
+      }
+    }
+  }
+
+  /// @param from      Zaciatocny Vrchol
+  /// @param p         Pole predchodcov
+  /// @return Pole vzdialenosti z vrcholu from do vsetkych ostatnych vrcholov
+  List<double> _getDistances(int from) {
+    List<double> d = List.generate(_nodesTree.getSize(), (_) => double.infinity,
+        growable: false);
+    d[from] = 0;
+
+    Queue<int> queue = Queue();
+    Queue<int> queue2 = Queue();
+
+    queue.add(from);
+    int pocetVyberani = 0;
+    while (queue.isNotEmpty || queue2.isNotEmpty) {
+      int nodeFrom;
+      if (queue2.isNotEmpty) {
+        nodeFrom = queue2.removeFirst();
+      } else {
+        nodeFrom = queue.removeFirst();
+      }
+      pocetVyberani++;
+      final uzol = _nodesTree.search(Node(id: nodeFrom));
+      Edge nodeEdge = uzol.edge;
+      while (nodeEdge != null) {
+        int nodeTo = nodeEdge.getTo(nodeFrom);
+        if (d[nodeFrom] + nodeEdge.length < d[nodeTo]) {
+          double oldValue = d[nodeTo];
+          d[nodeTo] = d[nodeFrom] + nodeEdge.length;
+          if (oldValue != double.infinity) {
+            queue2.add(nodeTo);
+          } else {
+            queue.add(nodeTo);
+          }
+        }
+        nodeEdge = nodeEdge.getNextEdge(nodeFrom);
+      }
+    }
+    if (kDebugMode) {
+      print("\nPocet vyberani: $pocetVyberani");
+    }
+    return d;
+  }
+
+  /// @param from       Zaciatocny Vrchol
+  /// @param to         Koncovy vrchol
+  /// @param postupnost Ak true, tak sa zobrazi aj postupnost trasy
+  void printDistance(int from, int to, bool postupnost) async {
+    final d = _getDistances(from);
+    if (kDebugMode) {
+      print("$from -> $to, Dlzka: ${d[to]}");
+    }
+  }
+
+  void printAllDistances(int from, int count) async {
+    final d = _getDistances(from);
+    if (kDebugMode) {
+      print("Vzdialenost z vrchola $from do $count vrcholov: ");
+    }
+    if (count == -1) {
+      count = d.length;
+    }
+    for (int i = 0; i < count; i++) {
+      if (kDebugMode) {
+        print("${d[i]}, ");
       }
     }
   }

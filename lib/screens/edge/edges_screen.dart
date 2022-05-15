@@ -5,7 +5,7 @@ import '../../application.dart';
 import '../../widgets/edge_item.dart';
 
 class EdgesScreen extends StatefulWidget {
-  const EdgesScreen({Key? key}) : super(key: key);
+  const EdgesScreen({Key key}) : super(key: key);
 
   @override
   State<EdgesScreen> createState() => _EdgesScreenState();
@@ -30,7 +30,7 @@ class _EdgesScreenState extends State<EdgesScreen>
               builder: (ctx, app, _) => Container(
                 child: app.loading
                     ? const Center(child: CircularProgressIndicator())
-                    : app.hrany.isEmpty
+                    : app.isEdgesTreeEmpty
                         ? Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Center(
@@ -40,12 +40,10 @@ class _EdgesScreenState extends State<EdgesScreen>
                               ),
                             ),
                           )
-                        : ListView.builder(
+                        : ListView(
                             controller: controller,
-                            itemCount: app.hrany.length,
-                            itemBuilder: (ctx, index) {
-                              return EdgeItem(edge: app.hrany.elementAt(index));
-                            },
+                            children: app.allEdges
+                                .map((e) => EdgeItem(edge: e)).toList(),
                           ),
               ),
             ),

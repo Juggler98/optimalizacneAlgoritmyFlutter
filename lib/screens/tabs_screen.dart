@@ -6,7 +6,7 @@ import 'package:optimalizacne_algoritmy/screens/node/node_edit_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/node/nodes_screen.dart';
 
 class TabsScreen extends StatefulWidget {
-  const TabsScreen({Key? key}) : super(key: key);
+  const TabsScreen({Key key}) : super(key: key);
 
   @override
   _TabsScreenState createState() => _TabsScreenState();
@@ -14,9 +14,9 @@ class TabsScreen extends StatefulWidget {
 
 class _TabsScreenState extends State<TabsScreen>
     with SingleTickerProviderStateMixin, RouteAware {
-  late List<Widget> _pages;
+  List<Widget> _pages;
 
-  late PageController _pageController;
+  PageController _pageController;
 
   var _selectedPageIndex = 0;
 
@@ -56,7 +56,7 @@ class _TabsScreenState extends State<TabsScreen>
         title: const Text(
           'Optimalizačné algoritmy',
         ),
-        actions: [
+        actions: const [
           // IconButton(
           //     icon: const Icon(Icons.refresh),
           //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),

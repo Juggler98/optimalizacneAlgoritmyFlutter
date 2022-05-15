@@ -9,7 +9,7 @@ class NumberTextField extends StatelessWidget {
 
   const NumberTextField(
       this.changeText, this.placeholder, this.controller, this.isDecimal,
-      {Key? key})
+      {Key key})
       : super(key: key);
 
   @override

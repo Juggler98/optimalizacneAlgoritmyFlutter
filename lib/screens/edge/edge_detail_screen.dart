@@ -4,14 +4,13 @@ import 'package:flutter/material.dart';
 
 import '../../application.dart';
 import '../../models/edge.dart';
-import '../../models/node.dart';
 import '../node/node_detail_screen.dart';
 import 'edge_edit_screen.dart';
 
 class EdgeDetailScreen extends StatefulWidget {
-  final Hrana edge;
+  final Edge edge;
 
-  const EdgeDetailScreen({required this.edge, Key? key}) : super(key: key);
+  const EdgeDetailScreen({@required this.edge, Key key}) : super(key: key);
 
   @override
   State<EdgeDetailScreen> createState() => _EdgeDetailScreenState();
@@ -20,7 +19,7 @@ class EdgeDetailScreen extends StatefulWidget {
 class _EdgeDetailScreenState extends State<EdgeDetailScreen> {
   final app = Application();
 
-  late Hrana edge;
+  Edge edge;
 
   @override
   void initState() {
@@ -47,9 +46,7 @@ class _EdgeDetailScreenState extends State<EdgeDetailScreen> {
                   .then((reload) {
                 if (reload != null) {
                   setState(() {
-                    edge = app.hrany.firstWhere(
-                        (element) => element.id == edge.id,
-                        orElse: () => Hrana(id: -1, from: -1, to: -1));
+                    edge = app.getEdge(edge.id);
                   });
                 }
               });
@@ -121,10 +118,8 @@ class _EdgeDetailScreenState extends State<EdgeDetailScreen> {
                           cursor: SystemMouseCursors.click,
                           child: GestureDetector(
                             onTap: () {
-                              final node = app.uzly.firstWhere(
-                                  (element) => element.id == edge.from,
-                                  orElse: () => Uzol(id: -1));
-                              if (node.id != -1) {
+                              final node = app.getNode(edge.from);
+                              if (node != null) {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (ctx) =>
@@ -153,10 +148,8 @@ class _EdgeDetailScreenState extends State<EdgeDetailScreen> {
                           cursor: SystemMouseCursors.click,
                           child: GestureDetector(
                             onTap: () {
-                              final node = app.uzly.firstWhere(
-                                  (element) => element.id == edge.to,
-                                  orElse: () => Uzol(id: -1));
-                              if (node.id != -1) {
+                              final node = app.getNode(edge.to);
+                              if (node != null) {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (ctx) =>
@@ -186,6 +179,5 @@ class _EdgeDetailScreenState extends State<EdgeDetailScreen> {
         ),
       ),
     );
-    ;
   }
 }

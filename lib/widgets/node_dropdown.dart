@@ -7,7 +7,7 @@ class NodeTypeDropdown extends StatefulWidget {
   final Function changeValue;
   final NodeType type;
 
-  const NodeTypeDropdown(this.changeValue, this.type, {Key? key}) : super(key: key);
+  const NodeTypeDropdown(this.changeValue, this.type, {Key key}) : super(key: key);
 
   @override
   _NodeTypeDropdownState createState() => _NodeTypeDropdownState();
@@ -54,7 +54,7 @@ class _NodeTypeDropdownState extends State<NodeTypeDropdown> {
           items: _nodeTypeItems.map((valueItem) {
             return DropdownMenuItem(
               value: valueItem,
-              child: Text(Uzol.getNodeTypeString(valueItem)),
+              child: Text(Node.getNodeTypeString(valueItem)),
             );
           }).toList(),
         ),

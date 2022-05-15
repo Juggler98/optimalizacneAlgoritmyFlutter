@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../../application.dart';
 
 class NodesScreen extends StatefulWidget {
-  const NodesScreen({Key? key}) : super(key: key);
+  const NodesScreen({Key key}) : super(key: key);
 
   @override
   State<NodesScreen> createState() => _NodesScreenState();
@@ -30,7 +30,7 @@ class _NodesScreenState extends State<NodesScreen>
               builder: (ctx, app, _) => Container(
                 child: app.loading
                     ? const Center(child: CircularProgressIndicator())
-                    : app.uzly.isEmpty
+                    : app.isNodesTreeEmpty
                         ? Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Center(
@@ -40,12 +40,11 @@ class _NodesScreenState extends State<NodesScreen>
                               ),
                             ),
                           )
-                        : ListView.builder(
+                        : ListView(
                             controller: controller,
-                            itemCount: app.uzly.length,
-                            itemBuilder: (ctx, index) {
-                              return NodeItem(node: app.uzly.elementAt(index));
-                            },
+                            children: app.allNodes
+                                .map((e) => NodeItem(node: e))
+                                .toList(),
                           ),
               ),
             ),

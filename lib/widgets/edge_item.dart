@@ -6,9 +6,9 @@ import 'package:optimalizacne_algoritmy/screens/edge/edge_edit_screen.dart';
 import '../models/edge.dart';
 
 class EdgeItem extends StatelessWidget {
-  final Hrana edge;
+  final Edge edge;
 
-  const EdgeItem({required this.edge, Key? key}) : super(key: key);
+  const EdgeItem({@required this.edge, Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

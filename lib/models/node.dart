@@ -1,17 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:optimalizacne_algoritmy/models/edge.dart';
 import 'package:optimalizacne_algoritmy/models/typ_uzla.dart';
 
-class Uzol {
+class Node implements Comparable<Node> {
   final int id;
-  String? name;
+  String name;
   NodeType type;
-  double? capacity;
-  Hrana? edge;
-  double? lat;
-  double? lon;
+  double capacity;
+  Edge edge;
+  double lat;
+  double lon;
 
-  Uzol({
-    required this.id,
+  Node({
+    @required this.id,
     this.name,
     this.type = NodeType.nespecifikovane,
     this.capacity,
@@ -21,12 +22,13 @@ class Uzol {
   });
 
   void vypis() {
-    print("Node{" +
-        "id=" + id.toString() +
+    if (kDebugMode) {
+      print("Node{" "id=" + id.toString() +
         ", lat=" + lat.toString() +
         ", lon=" + lon.toString() +
         ", edge=" + edge.toString() +
         '}');
+    }
   }
 
   static String getNodeTypeString(NodeType type) {
@@ -42,5 +44,10 @@ class Uzol {
       default:
         return 'Unknown';
     }
+  }
+
+  @override
+  int compareTo(Node other) {
+    return id.compareTo(other.id);
   }
 }

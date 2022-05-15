@@ -8,9 +8,9 @@ import '../models/typ_uzla.dart';
 import '../screens/node/node_edit_screen.dart';
 
 class NodeItem extends StatelessWidget {
-  final Uzol node;
+  final Node node;
 
-  const NodeItem({required this.node, Key? key}) : super(key: key);
+  const NodeItem({@required this.node, Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class NodeItem extends StatelessWidget {
                     (node.name != null
                             ? 'Názov: ${node.name.toString()}'
                             : '') +
-                        (' Typ: ${Uzol.getNodeTypeString(node.type)}') +
+                        (' Typ: ${Node.getNodeTypeString(node.type)}') +
                         (node.capacity != null
                             ? ' ${node.type == NodeType.zakaznik ? 'Požiadavka' : 'Kapacita'}: ${node.capacity.toString()}'
                             : '') +

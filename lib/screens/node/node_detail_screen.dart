@@ -8,9 +8,9 @@ import '../../models/typ_uzla.dart';
 import 'node_edit_screen.dart';
 
 class NodeDetailScreen extends StatefulWidget {
-  final Uzol node;
+  final Node node;
 
-  const NodeDetailScreen({required this.node, Key? key}) : super(key: key);
+  const NodeDetailScreen({@required this.node, Key key}) : super(key: key);
 
   @override
   State<NodeDetailScreen> createState() => _NodeDetailScreenState();
@@ -19,7 +19,7 @@ class NodeDetailScreen extends StatefulWidget {
 class _NodeDetailScreenState extends State<NodeDetailScreen> {
   final app = Application();
 
-  late Uzol node;
+  Node node;
 
   @override
   void initState() {
@@ -46,8 +46,7 @@ class _NodeDetailScreenState extends State<NodeDetailScreen> {
                   .then((reload) {
                 if (reload != null) {
                   setState(() {
-                    node = app.uzly.firstWhere((element) => element.id == node.id,
-                        orElse: () => Uzol(id: -1));
+                    node = app.getNode(node.id);
                   });
                 }
               });
@@ -119,7 +118,7 @@ class _NodeDetailScreenState extends State<NodeDetailScreen> {
                     Text(
                         'Názov: ${node.name != null ? node.name.toString() : ''}'),
                     const SizedBox(height: 8),
-                    Text('Typ: ${Uzol.getNodeTypeString(node.type)}'),
+                    Text('Typ: ${Node.getNodeTypeString(node.type)}'),
                     const SizedBox(height: 8),
                     Text(
                         '${node.type == NodeType.zakaznik ? 'Požiadavka' : 'Kapacita'}: ${node.capacity != null ? node.capacity.toString() : ''}'),
@@ -134,6 +133,5 @@ class _NodeDetailScreenState extends State<NodeDetailScreen> {
         ),
       ),
     );
-    ;
   }
 }

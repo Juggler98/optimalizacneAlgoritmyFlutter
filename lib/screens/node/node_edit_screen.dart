@@ -8,19 +8,19 @@ import '../../text_fields/number_textfield.dart';
 import '../../text_fields/string_textfield.dart';
 
 class NodeEditScreen extends StatefulWidget {
-  final Uzol? node;
+  final Node node;
 
-  const NodeEditScreen({Key? key, this.node}) : super(key: key);
+  const NodeEditScreen({Key key, this.node}) : super(key: key);
 
   @override
   _NodeEditScreenState createState() => _NodeEditScreenState();
 }
 
 class _NodeEditScreenState extends State<NodeEditScreen> {
-  String? _name;
-  double? _x;
-  double? _y;
-  double? _capacity;
+  String _name;
+  double _x;
+  double _y;
+  double _capacity;
   NodeType _type = NodeType.nespecifikovane;
   final _nameController = TextEditingController();
   final _controller2 = TextEditingController();
@@ -37,7 +37,7 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
       _x = widget.node?.lon;
       _y = widget.node?.lat;
       _capacity = widget.node?.capacity;
-      _type = (widget.node?.type)!;
+      _type = (widget.node?.type);
 
       _nameController.text = _name ?? '';
       _capacityController.text = _capacity == null ? '' : _capacity.toString();
@@ -58,19 +58,19 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
     });
   }
 
-  void _setName(String? name) {
+  void _setName(String name) {
     setState(() {
       _name = name;
     });
   }
 
-  void _setX(double? x) {
+  void _setX(double x) {
     setState(() {
       _x = x;
     });
   }
 
-  void _setY(double? y) {
+  void _setY(double y) {
     setState(() {
       _y = y;
     });
@@ -82,7 +82,7 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
     });
   }
 
-  void _setCapacity(double? kapacita) {
+  void _setCapacity(double kapacita) {
     setState(() {
       _capacity = kapacita;
     });
@@ -90,7 +90,7 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
 
   void _save() {
     if (widget.node != null) {
-      _app.editNode(widget.node!, _name, _capacity, _type);
+      _app.editNode(widget.node, _name, _capacity, _type);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Uzol bol upravený'),
@@ -98,7 +98,7 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
       );
       Navigator.of(context).pop(true);
     } else {
-      final node = Uzol(
+      final node = Node(
         id: _app.nodesCount,
         lon: _x,
         lat: _y,
@@ -114,16 +114,6 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
       );
       _clearData();
     }
-  }
-
-  void _showScaffold(String text) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(text),
-        backgroundColor: Theme.of(context).errorColor,
-      ),
-    );
   }
 
   @override

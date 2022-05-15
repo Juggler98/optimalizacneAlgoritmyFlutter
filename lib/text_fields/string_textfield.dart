@@ -5,7 +5,7 @@ class StringTextField extends StatelessWidget {
   final String placeholder;
   final TextEditingController controller;
 
-  const StringTextField(this.changeText, this.placeholder, this.controller, {Key? key}) : super(key: key);
+  const StringTextField(this.changeText, this.placeholder, this.controller, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

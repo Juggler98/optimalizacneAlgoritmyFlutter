@@ -1,26 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:optimalizacne_algoritmy/models/typ_uzla.dart';
-import 'package:optimalizacne_algoritmy/widgets/node_dropdown.dart';
 
 import '../../application.dart';
 import '../../models/edge.dart';
-import '../../models/node.dart';
 import '../../text_fields/number_textfield.dart';
-import '../../text_fields/string_textfield.dart';
 
 class EdgeEditScreen extends StatefulWidget {
-  final Hrana? edge;
+  final Edge edge;
 
-  const EdgeEditScreen({Key? key, this.edge}) : super(key: key);
+  const EdgeEditScreen({Key key, this.edge}) : super(key: key);
 
   @override
   _EdgeEditScreenState createState() => _EdgeEditScreenState();
 }
 
 class _EdgeEditScreenState extends State<EdgeEditScreen> {
-  double? _length;
-  int? _from;
-  int? _to;
+  double _length;
+  int _from;
+  int _to;
   bool _active = true;
   final _controller = TextEditingController();
   final _controller2 = TextEditingController();
@@ -35,7 +31,7 @@ class _EdgeEditScreenState extends State<EdgeEditScreen> {
       _length = widget.edge?.length;
       _from = widget.edge?.from;
       _to = widget.edge?.to;
-      _active = (widget.edge?.active)!;
+      _active = (widget.edge?.active);
       _lengthController.text = _length == null ? '' : _length.toString();
     }
   }
@@ -51,19 +47,19 @@ class _EdgeEditScreenState extends State<EdgeEditScreen> {
     });
   }
 
-  void _setLength(double? length) {
+  void _setLength(double length) {
     setState(() {
       _length = length;
     });
   }
 
-  void _setFrom(int? from) {
+  void _setFrom(int from) {
     setState(() {
       _from = from;
     });
   }
 
-  void _setTo(int? to) {
+  void _setTo(int to) {
     setState(() {
       _to = to;
     });
@@ -71,7 +67,7 @@ class _EdgeEditScreenState extends State<EdgeEditScreen> {
 
   void _save() {
     if (widget.edge != null) {
-      _app.editEdge(widget.edge!, _length, _active);
+      _app.editEdge(widget.edge, _length, _active);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Hrana bola upravená'),
@@ -79,24 +75,16 @@ class _EdgeEditScreenState extends State<EdgeEditScreen> {
       );
       Navigator.of(context).pop(true);
     } else {
-      if (_app.uzly
-              .firstWhere((element) => element.id == _from,
-                  orElse: () => Uzol(id: -1))
-              .id ==
-          -1) {
+      if (_app.getNode(_from) == null) {
         _showScaffold('Uzol \'Od\' neexistuje');
         return;
       }
-      if (_app.uzly
-              .firstWhere((element) => element.id == _to,
-                  orElse: () => Uzol(id: -1))
-              .id ==
-          -1) {
+      if (_app.getNode(_to) == null) {
         _showScaffold('Uzol \'Do\' neexistuje');
         return;
       }
       final edge =
-          Hrana(id: _app.edgesCount, from: _from!, to: _to!, length: _length);
+          Edge(id: _app.edgesCount, from: _from, to: _to, length: _length);
       _app.addEdge(edge);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
