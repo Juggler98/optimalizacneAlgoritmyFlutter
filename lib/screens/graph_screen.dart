@@ -3,10 +3,9 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:optimalizacne_algoritmy/application.dart';
-import 'package:optimalizacne_algoritmy/models/node.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../models/edge.dart';
 
@@ -58,64 +57,64 @@ class _GraphScreenState extends State<GraphScreen> {
       final node = app.uzly[i];
       Hrana? nodeEdge = node.edge;
       while (nodeEdge != null) {
-        final node1 = graphicsNodes.firstWhere((element) => (element.key!.value as int?) == nodeEdge?.from);
-        final node2 = graphicsNodes.firstWhere((element) => (element.key!.value as int?) == nodeEdge?.to);
-        graph.addEdge(node1, node2);
+        if (nodeEdge.active) {
+          final node1 = graphicsNodes.firstWhere(
+              (element) => (element.key!.value as int?) == nodeEdge?.from);
+          final node2 = graphicsNodes.firstWhere(
+              (element) => (element.key!.value as int?) == nodeEdge?.to);
+          graph.addEdge(node1, node2);
+        }
         nodeEdge = nodeEdge.getNextEdge(node.id);
       }
     }
     setState(() {
       builder = FruchtermanReingoldAlgorithm(iterations: 1000);
     });
-
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Column(
-          //mainAxisSize: MainAxisSize.max,
-          children: [
-            builder == null
-                ? Text('Loading')
-                : Expanded(
-                    child: InteractiveViewer(
-                        constrained: false,
-                        boundaryMargin: EdgeInsets.all(8),
-                        minScale: 0.001,
-                        maxScale: 100,
-                        child: GraphView(
-                            graph: graph,
-                            algorithm: builder!,
-                            paint: Paint()
-                              ..color = Colors.green
-                              ..strokeWidth = 5
-                              ..style = PaintingStyle.fill,
-                            builder: (Node node) {
-                              // I can decide what widget should be shown here based on the id
-                              var a = node.key!.value as int?;
-                              if (a == 2) {
-                                return rectangWidget(a);
-                              }
-                              return rectangWidget(a);
-                            })),
-                  ),
-          ],
-        ));
+      //mainAxisSize: MainAxisSize.max,
+      children: [
+        builder == null
+            ? Text('Loading')
+            : Expanded(
+                child: InteractiveViewer(
+                    constrained: false,
+                    boundaryMargin: EdgeInsets.all(8),
+                    minScale: 0.001,
+                    maxScale: 100,
+                    child: GraphView(
+                        graph: graph,
+                        algorithm: builder!,
+                        paint: Paint()
+                          ..color = Colors.green
+                          ..strokeWidth = 5
+                          ..style = PaintingStyle.fill,
+                        builder: (Node node) {
+                          // I can decide what widget should be shown here based on the id
+                          var a = node.key!.value as int?;
+                          if (a == 2) {
+                            return nodeWidget(a);
+                          }
+                          return nodeWidget(a);
+                        })),
+              ),
+      ],
+    ));
   }
 
-  Widget rectangWidget(int? i) {
+  Widget nodeWidget(int? i) {
     return Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(25),
+        padding: const EdgeInsets.all(12),
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(color: Colors.blue, spreadRadius: 1),
           ],
         ),
-        child: Text('Node $i'));
+        child: Text('$i'));
   }
 }

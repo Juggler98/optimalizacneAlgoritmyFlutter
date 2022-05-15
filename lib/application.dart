@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:optimalizacne_algoritmy/models/typ_uzla.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'models/edge.dart';
@@ -170,7 +171,7 @@ class Application with ChangeNotifier {
     loading = false;
     notifyListeners();
 
-    //vypisHranyPreVrcholy(-1);
+    vypisHranyPreVrcholy(-1);
   }
 
   void _reload() {
@@ -253,13 +254,26 @@ class Application with ChangeNotifier {
   void addNode(Uzol node) {
     uzly.add(node);
     nodesCount++;
-    _reload();
+    notifyListeners();
   }
 
   void addEdge(Hrana edge) {
     hrany.add(edge);
     edgesCount++;
     _reload();
+  }
+
+  void editNode(Uzol node, String? name, double? capacity, NodeType type) {
+    node.name = name;
+    node.capacity = capacity;
+    node.type = type;
+    notifyListeners();
+  }
+
+  void editEdge(Hrana edge, double? length, bool active) {
+    edge.length = length ?? 0;
+    edge.active = active;
+    notifyListeners();
   }
 
   void vypisHranyPreVrcholy(int pocet) {

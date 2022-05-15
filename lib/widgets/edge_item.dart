@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/screens/edge/edge_detail_screen.dart';
+import 'package:optimalizacne_algoritmy/screens/edge/edge_edit_screen.dart';
 import '../models/edge.dart';
 
 class EdgeItem extends StatelessWidget {
@@ -12,7 +13,8 @@ class EdgeItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: Platform.isWindows ? 80.0 : 16.0, vertical: 0),
+      padding: EdgeInsets.symmetric(
+          horizontal: Platform.isWindows ? 80.0 : 16.0, vertical: 0),
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(
@@ -37,7 +39,7 @@ class EdgeItem extends StatelessWidget {
                             ' Do: ${edge.to.toString()}' +
                         (edge.length != null
                             ? '   Dĺžka: ${edge.length.toString()}'
-                            : ''),
+                            : '') + (edge.active ? '  Aktivovaná' : '  Deaktivovaná'),
                   ),
                 ),
               ],
@@ -46,7 +48,11 @@ class EdgeItem extends StatelessWidget {
               icon: const Icon(Icons.edit),
               tooltip: 'Uprav',
               onPressed: () {
-
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => EdgeEditScreen(edge: edge),
+                  ),
+                );
               },
             ),
           ),

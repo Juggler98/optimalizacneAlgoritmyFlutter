@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:optimalizacne_algoritmy/widgets/node_item.dart';
 import 'package:provider/provider.dart';
 
 import '../../application.dart';
@@ -9,13 +8,19 @@ class EdgesScreen extends StatefulWidget {
   const EdgesScreen({Key? key}) : super(key: key);
 
   @override
-  _EdgesScreenState createState() => _EdgesScreenState();
+  State<EdgesScreen> createState() => _EdgesScreenState();
 }
 
-class _EdgesScreenState extends State<EdgesScreen> {
+class _EdgesScreenState extends State<EdgesScreen>
+    with AutomaticKeepAliveClientMixin<EdgesScreen> {
+  @override
+  bool get wantKeepAlive => true;
+
+  final controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: Column(
@@ -36,6 +41,7 @@ class _EdgesScreenState extends State<EdgesScreen> {
                             ),
                           )
                         : ListView.builder(
+                            controller: controller,
                             itemCount: app.hrany.length,
                             itemBuilder: (ctx, index) {
                               return EdgeItem(edge: app.hrany.elementAt(index));

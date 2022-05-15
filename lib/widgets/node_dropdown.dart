@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/models/typ_uzla.dart';
 
+import '../models/node.dart';
+
 class NodeTypeDropdown extends StatefulWidget {
   final Function changeValue;
+  final NodeType type;
 
-  const NodeTypeDropdown(this.changeValue, {Key? key}) : super(key: key);
+  const NodeTypeDropdown(this.changeValue, this.type, {Key? key}) : super(key: key);
 
   @override
   _NodeTypeDropdownState createState() => _NodeTypeDropdownState();
@@ -13,6 +16,11 @@ class NodeTypeDropdown extends StatefulWidget {
 class _NodeTypeDropdownState extends State<NodeTypeDropdown> {
   NodeType _nodeTypeChoose = NodeType.nespecifikovane;
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   final _nodeTypeItems = [
     NodeType.primarnyZdroj,
     NodeType.zakaznik,
@@ -20,28 +28,14 @@ class _NodeTypeDropdownState extends State<NodeTypeDropdown> {
     NodeType.nespecifikovane,
   ];
 
-  String _getSearchStringSwitch(NodeType type) {
-    switch (type) {
-      case NodeType.primarnyZdroj:
-        return 'Primárny zdroj';
-      case NodeType.zakaznik:
-        return 'Zákazník';
-      case NodeType.prekladiskoMozne:
-        return 'Možné prekladisko';
-      case NodeType.nespecifikovane:
-        return 'Nešpecifikovaný';
-      default:
-        return 'Unknown';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    _nodeTypeChoose = widget.type;
     return Padding(
-      padding: const EdgeInsets.only(
-          left: 30.0, right: 30.0, top: 8.0, bottom: 2.0),
+      padding:
+          const EdgeInsets.only(left: 30.0, right: 30.0, top: 8.0, bottom: 2.0),
       child: Container(
-        padding: const EdgeInsets.only(left: 24, right: 24, top: 0, bottom: 0),
+        padding: const EdgeInsets.only(left: 12, right: 24, top: 0, bottom: 0),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey, width: 1),
           borderRadius: BorderRadius.circular(20),
@@ -60,7 +54,7 @@ class _NodeTypeDropdownState extends State<NodeTypeDropdown> {
           items: _nodeTypeItems.map((valueItem) {
             return DropdownMenuItem(
               value: valueItem,
-              child: Text(_getSearchStringSwitch(valueItem)),
+              child: Text(Uzol.getNodeTypeString(valueItem)),
             );
           }).toList(),
         ),

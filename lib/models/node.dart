@@ -4,7 +4,7 @@ import 'package:optimalizacne_algoritmy/models/typ_uzla.dart';
 class Uzol {
   final int id;
   String? name;
-  NodeType? type;
+  NodeType type;
   double? capacity;
   Hrana? edge;
   double? lat;
@@ -13,7 +13,7 @@ class Uzol {
   Uzol({
     required this.id,
     this.name,
-    this.type,
+    this.type = NodeType.nespecifikovane,
     this.capacity,
     this.edge,
     this.lat,
@@ -27,5 +27,20 @@ class Uzol {
         ", lon=" + lon.toString() +
         ", edge=" + edge.toString() +
         '}');
+  }
+
+  static String getNodeTypeString(NodeType type) {
+    switch (type) {
+      case NodeType.primarnyZdroj:
+        return 'Primárny zdroj';
+      case NodeType.zakaznik:
+        return 'Zákazník';
+      case NodeType.prekladiskoMozne:
+        return 'Možné prekladisko';
+      case NodeType.nespecifikovane:
+        return 'Nešpecifikovaný';
+      default:
+        return 'Unknown';
+    }
   }
 }

@@ -6,13 +6,27 @@ import '../../application.dart';
 import '../../models/edge.dart';
 import '../../models/node.dart';
 import '../node/node_detail_screen.dart';
+import 'edge_edit_screen.dart';
 
-class EdgeDetailScreen extends StatelessWidget {
+class EdgeDetailScreen extends StatefulWidget {
   final Hrana edge;
 
-  EdgeDetailScreen({required this.edge, Key? key}) : super(key: key);
+  const EdgeDetailScreen({required this.edge, Key? key}) : super(key: key);
 
+  @override
+  State<EdgeDetailScreen> createState() => _EdgeDetailScreenState();
+}
+
+class _EdgeDetailScreenState extends State<EdgeDetailScreen> {
   final app = Application();
+
+  late Hrana edge;
+
+  @override
+  void initState() {
+    super.initState();
+    edge = widget.edge;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +38,21 @@ class EdgeDetailScreen extends StatelessWidget {
             icon: const Icon(Icons.edit),
             tooltip: 'Uprav',
             onPressed: () {
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (ctx) => NewLogScreen(stone: stone),
-              //   ),
-              // );
+              Navigator.of(context)
+                  .push(
+                MaterialPageRoute(
+                  builder: (ctx) => EdgeEditScreen(edge: edge),
+                ),
+              )
+                  .then((reload) {
+                if (reload != null) {
+                  setState(() {
+                    edge = app.hrany.firstWhere(
+                        (element) => element.id == edge.id,
+                        orElse: () => Hrana(id: -1, from: -1, to: -1));
+                  });
+                }
+              });
             },
           ),
           IconButton(
@@ -73,9 +97,9 @@ class EdgeDetailScreen extends StatelessWidget {
               elevation: 1,
               margin: const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
               child: Padding(
-                padding: EdgeInsets.all(Platform.isWindows ? 64.0 : 5),
+                padding: EdgeInsets.all(Platform.isWindows ? 58.0 : 5),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -154,6 +178,8 @@ class EdgeDetailScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text('Dĺžka: ${edge.length.toString()}'),
+                    const SizedBox(height: 8),
+                    Text(edge.active ? 'Aktivovaná' : 'Deaktivovaná'),
                   ],
                 ),
               )),

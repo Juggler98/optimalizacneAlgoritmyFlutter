@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/models/node.dart';
 import 'package:optimalizacne_algoritmy/screens/node/node_detail_screen.dart';
 
+import '../models/typ_uzla.dart';
+import '../screens/node/node_edit_screen.dart';
+
 class NodeItem extends StatelessWidget {
   final Uzol node;
 
@@ -37,27 +40,25 @@ class NodeItem extends StatelessWidget {
                     (node.name != null
                             ? 'Názov: ${node.name.toString()}'
                             : '') +
-                        (node.type != null
-                            ? ' Typ: ${node.type.toString()}'
-                            : '') +
+                        (' Typ: ${Uzol.getNodeTypeString(node.type)}') +
                         (node.capacity != null
-                            ? ' Kapacita: ${node.capacity.toString()}'
+                            ? ' ${node.type == NodeType.zakaznik ? 'Požiadavka' : 'Kapacita'}: ${node.capacity.toString()}'
                             : '') +
-                        (node.lat != null ? ' X: ${node.lat.toString()}' : '') +
-                        (node.lon != null ? ' Y: ${node.lon.toString()}' : ''),
+                        (node.lat != null ? ' X: ${node.lon.toString()}' : '') +
+                        (node.lon != null ? ' Y: ${node.lat.toString()}' : ''),
                   ),
                 ),
               ],
             ),
-            trailing:  IconButton(
+            trailing: IconButton(
               icon: const Icon(Icons.edit),
               tooltip: 'Uprav',
               onPressed: () {
-                // Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (ctx) => NodeDetailScreen(node: node),
-                //   ),
-                // );
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => NodeEditScreen(node: node),
+                  ),
+                );
               },
             ),
           ),

@@ -8,13 +8,19 @@ class NodesScreen extends StatefulWidget {
   const NodesScreen({Key? key}) : super(key: key);
 
   @override
-  _NodesScreenState createState() => _NodesScreenState();
+  State<NodesScreen> createState() => _NodesScreenState();
 }
 
-class _NodesScreenState extends State<NodesScreen> {
+class _NodesScreenState extends State<NodesScreen>
+    with AutomaticKeepAliveClientMixin<NodesScreen> {
+  @override
+  bool get wantKeepAlive => true;
+
+  final controller = ScrollController();
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: Column(
@@ -35,6 +41,7 @@ class _NodesScreenState extends State<NodesScreen> {
                             ),
                           )
                         : ListView.builder(
+                            controller: controller,
                             itemCount: app.uzly.length,
                             itemBuilder: (ctx, index) {
                               return NodeItem(node: app.uzly.elementAt(index));

@@ -4,13 +4,28 @@ import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/application.dart';
 
 import '../../models/node.dart';
+import '../../models/typ_uzla.dart';
+import 'node_edit_screen.dart';
 
-class NodeDetailScreen extends StatelessWidget {
+class NodeDetailScreen extends StatefulWidget {
   final Uzol node;
 
-  NodeDetailScreen({required this.node, Key? key}) : super(key: key);
+  const NodeDetailScreen({required this.node, Key? key}) : super(key: key);
 
+  @override
+  State<NodeDetailScreen> createState() => _NodeDetailScreenState();
+}
+
+class _NodeDetailScreenState extends State<NodeDetailScreen> {
   final app = Application();
+
+  late Uzol node;
+
+  @override
+  void initState() {
+    super.initState();
+    node = widget.node;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +37,20 @@ class NodeDetailScreen extends StatelessWidget {
             icon: const Icon(Icons.edit),
             tooltip: 'Uprav',
             onPressed: () {
-              // Navigator.of(context).push(
-              //   MaterialPageRoute(
-              //     builder: (ctx) => NewLogScreen(stone: stone),
-              //   ),
-              // );
+              Navigator.of(context)
+                  .push(
+                MaterialPageRoute(
+                  builder: (ctx) => NodeEditScreen(node: node),
+                ),
+              )
+                  .then((reload) {
+                if (reload != null) {
+                  setState(() {
+                    node = app.uzly.firstWhere((element) => element.id == node.id,
+                        orElse: () => Uzol(id: -1));
+                  });
+                }
+              });
             },
           ),
           IconButton(
@@ -69,11 +93,11 @@ class NodeDetailScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(2.0),
               ),
               elevation: 1,
-              margin: const EdgeInsets.symmetric(vertical: 1, horizontal: 0),
+              margin: const EdgeInsets.symmetric(vertical: 1, horizontal: 8),
               child: Padding(
                 padding: EdgeInsets.all(Platform.isWindows ? 58.0 : 5),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -85,16 +109,20 @@ class NodeDetailScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text('ID: ${node.id.toString()}'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('ID: ${node.id.toString()}'),
+                      ],
+                    ),
                     const SizedBox(height: 8),
                     Text(
                         'Názov: ${node.name != null ? node.name.toString() : ''}'),
                     const SizedBox(height: 8),
-                    Text(
-                        'Typ: ${node.type != null ? node.type.toString() : ''}'),
+                    Text('Typ: ${Uzol.getNodeTypeString(node.type)}'),
                     const SizedBox(height: 8),
                     Text(
-                        'Kapacita: ${node.capacity != null ? node.capacity.toString() : ''}'),
+                        '${node.type == NodeType.zakaznik ? 'Požiadavka' : 'Kapacita'}: ${node.capacity != null ? node.capacity.toString() : ''}'),
                     const SizedBox(height: 8),
                     Text((node.lat != null
                             ? ' X: ${node.lon.toString()}'

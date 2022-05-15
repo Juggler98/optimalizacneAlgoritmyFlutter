@@ -5,6 +5,7 @@ class Hrana {
   double? length;
   Hrana? nextEdgeFrom;
   Hrana? nextEdgeTo;
+  bool active;
 
   Hrana({
     required this.id,
@@ -12,7 +13,8 @@ class Hrana {
     required this.to,
     this.length,
     this.nextEdgeFrom,
-    this.nextEdgeTo
+    this.nextEdgeTo,
+    this.active = true
   });
 
    int getTo(int from) {

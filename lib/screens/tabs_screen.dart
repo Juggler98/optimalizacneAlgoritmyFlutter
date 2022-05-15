@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:optimalizacne_algoritmy/screens/edge/edge_new_screen.dart';
+import 'package:optimalizacne_algoritmy/screens/edge/edge_edit_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/edge/edges_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/graph_screen.dart';
-import 'package:optimalizacne_algoritmy/screens/node/node_new_screen.dart';
+import 'package:optimalizacne_algoritmy/screens/node/node_edit_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/node/nodes_screen.dart';
 
 class TabsScreen extends StatefulWidget {
@@ -97,7 +97,7 @@ class _TabsScreenState extends State<TabsScreen>
                         Navigator.pop(context);
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (ctx) => const NodeNewScreen(),
+                            builder: (ctx) => const NodeEditScreen(),
                           ),
                         );
                       },
@@ -109,7 +109,7 @@ class _TabsScreenState extends State<TabsScreen>
                         Navigator.pop(context);
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (ctx) => const EdgeNewScreen(),
+                            builder: (ctx) => const EdgeEditScreen(),
                           ),
                         );
                       },
