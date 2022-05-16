@@ -264,6 +264,9 @@ class Application with ChangeNotifier {
   }
 
   Future<FileResult> loadData(String path) async {
+    loading = true;
+    notifyListeners();
+
     final fileEdges = File('$path/${_fileNames.elementAt(0)}');
     final fileEdgesInc = File('$path/${_fileNames.elementAt(1)}');
     final fileNodes = File('$path/${_fileNames.elementAt(2)}');
@@ -306,6 +309,7 @@ class Application with ChangeNotifier {
       loading = false;
       notifyListeners();
       if (kDebugMode) {
+        print(e);
         print(FileResult.fileNotExist);
       }
       return FileResult.fileNotExist;
@@ -424,6 +428,7 @@ class Application with ChangeNotifier {
       loading = false;
       notifyListeners();
       if (kDebugMode) {
+        print(e);
         print(FileResult.incidentCountLength);
       }
       return FileResult.incidentCountLength;

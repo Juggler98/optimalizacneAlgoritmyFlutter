@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -43,8 +45,20 @@ class StaticMethods {
   }
 
   static Future<void> saveData(BuildContext context) async {
+    String selectedDirectory;
     try {
-      String selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      if (Platform.isAndroid) {
+        FilePickerResult filesPicked =
+            await FilePicker.platform.pickFiles(allowMultiple: true);
+
+        if (filesPicked != null) {
+          List<File> files =
+              filesPicked.paths.map((path) => File(path)).toList();
+          selectedDirectory = files.elementAt(0).parent.path;
+        }
+      } else {
+        selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      }
       if (selectedDirectory != null) {
         showSnackBar('Dáta sa ukladajú', context, Colors.green);
         await _app.writeToDirectory(selectedDirectory);
@@ -58,8 +72,20 @@ class StaticMethods {
   }
 
   static Future<void> loadData(BuildContext context) async {
+    String selectedDirectory;
     try {
-      String selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      if (Platform.isAndroid) {
+        FilePickerResult filesPicked =
+            await FilePicker.platform.pickFiles(allowMultiple: true);
+
+        if (filesPicked != null) {
+          List<File> files =
+              filesPicked.paths.map((path) => File(path)).toList();
+          selectedDirectory = files.elementAt(0).parent.path;
+        }
+      } else {
+        selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      }
       if (selectedDirectory != null) {
         _app.removeAllData();
         final result = await _app.loadData(selectedDirectory);

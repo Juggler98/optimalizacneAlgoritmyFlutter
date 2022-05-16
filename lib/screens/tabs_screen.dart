@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/screens/edge/edge_edit_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/edge/edges_screen.dart';
@@ -62,14 +64,14 @@ class _TabsScreenState extends State<TabsScreen>
         actions: [
           IconButton(
               icon: const Icon(Icons.save_outlined),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: Platform.isAndroid ? 0 : 8, vertical: 8),
               tooltip: 'Ulož do priečinka',
               onPressed: () {
                 StaticMethods.saveData(context);
               }),
           IconButton(
               icon: const Icon(Icons.upload_outlined),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: Platform.isAndroid ? 0 : 20, vertical: 8),
               tooltip: 'Načítaj z priečinka',
               onPressed: () {
                 StaticMethods.loadData(context);
