@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/application.dart';
 
 import '../../models/node.dart';
-import '../../models/typ_uzla.dart';
+import '../../models/node_type.dart';
 import 'node_edit_screen.dart';
 
 class NodeDetailScreen extends StatefulWidget {
@@ -35,6 +35,7 @@ class _NodeDetailScreenState extends State<NodeDetailScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             tooltip: 'Uprav',
             onPressed: () {
               Navigator.of(context)
@@ -54,6 +55,7 @@ class _NodeDetailScreenState extends State<NodeDetailScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.delete_forever),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             tooltip: 'Vymaž',
             onPressed: () {
               showDialog(

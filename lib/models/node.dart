@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:optimalizacne_algoritmy/models/edge.dart';
-import 'package:optimalizacne_algoritmy/models/typ_uzla.dart';
+import 'package:optimalizacne_algoritmy/models/node_type.dart';
 
 class Node implements Comparable<Node> {
   final int id;

@@ -1,46 +1,14 @@
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/application.dart';
-import 'package:optimalizacne_algoritmy/models/file_result.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:optimalizacne_algoritmy/constants.dart';
+import 'package:optimalizacne_algoritmy/static_methods.dart';
+import 'package:optimalizacne_algoritmy/screens/edge/edge_isolated_screen.dart';
+import 'package:optimalizacne_algoritmy/screens/node/node_isolated_screen.dart';
 
 class MainDrawer extends StatelessWidget {
   final Application _app = Application();
 
   MainDrawer({Key key}) : super(key: key);
-
-  void _showSnackBar(String text, BuildContext context, Color color) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(text),
-        backgroundColor: color,
-        duration: const Duration(seconds: 8),
-      ),
-    );
-  }
-
-  String _getFileResultString(FileResult type) {
-    switch (type) {
-      case FileResult.fileNotExist:
-        return 'Jeden zo súborov neexistuje';
-      case FileResult.idIsNotId2:
-        return 'V súbore edges_incid by malo byť na každom riadku rovnaké ID ako v edges.atr (ak hrana nemá dĺžku nastav jej -1)';
-      case FileResult.notIncident:
-        return 'Jednej z hrán chýba vrchol';
-      case FileResult.notCoordinate:
-        return 'Jeden z vrcholov nemá súradnicu';
-      case FileResult.incidentCountLength:
-        return 'Súbor edges_incid.txt by mal mať rovnaký počet riadkov ako edges.atr (ak hrana nemá dĺžku nastav jej -1)';
-      case FileResult.nodeIdCountCoordinate:
-        return 'Súbor nodes.atr by mal mať rovnaký počet riadkov ako nodes.atr (skús vymazať celý súbor nodes.atr)';
-      case FileResult.correct:
-        return 'correct';
-      default:
-        return 'Unknown';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,29 +55,7 @@ class MainDrawer extends StatelessWidget {
               ),
               title: const Text('Načítaj z priečinka'),
               onTap: () async {
-                try {
-                  String selectedDirectory =
-                      await FilePicker.platform.getDirectoryPath();
-                  if (selectedDirectory != null) {
-                    _app.removeAllData();
-                    final result = await _app.loadData(selectedDirectory);
-                    if (result == FileResult.correct) {
-                      _showSnackBar(
-                          'Dáta boli načítané', context, Colors.green);
-                      final prefs = await SharedPreferences.getInstance();
-                      prefs.setString('path', selectedDirectory);
-                    } else {
-                      if (kDebugMode) {
-                        print(_getFileResultString(result));
-                      }
-                      _showSnackBar(
-                          _getFileResultString(result), context, Colors.red);
-                    }
-                  }
-                } catch (e) {
-                  _showSnackBar(
-                      'Nastala chyba pri načítaní', context, Colors.red);
-                }
+                await StaticMethods.loadData(context);
                 Navigator.pop(context);
               },
             ),
@@ -121,21 +67,40 @@ class MainDrawer extends StatelessWidget {
               ),
               title: const Text('Ulož do priečinka'),
               onTap: () async {
-                try {
-                  String selectedDirectory =
-                      await FilePicker.platform.getDirectoryPath();
-                  if (selectedDirectory != null) {
-                    _showSnackBar('Dáta sa ukladajú', context, Colors.green);
-                    await _app.writeToDirectory(selectedDirectory);
-                  }
-                  _showSnackBar('Dáta boli uložené', context, Colors.green);
-                  final prefs = await SharedPreferences.getInstance();
-                  prefs.setString('path', selectedDirectory);
-                } catch (e) {
-                  _showSnackBar(
-                      'Nastala chyba pri ukladaní', context, Colors.red);
-                }
+                await StaticMethods.saveData(context);
                 Navigator.pop(context);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(
+                Icons.crop_square,
+                color: Colors.black54,
+              ),
+              title: const Text('Zobraz izolované uzly'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => NodeIsolatedScreen(),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(
+                Icons.linear_scale,
+                color: Colors.black54,
+              ),
+              title: const Text('Zobraz izolované hrany'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => EdgeIsolatedScreen(),
+                  ),
+                );
               },
             ),
             const Divider(),
@@ -158,7 +123,7 @@ class MainDrawer extends StatelessWidget {
                             child: const Text("Vymazať"),
                             onPressed: () {
                               _app.removeAllData();
-                              _showSnackBar(
+                              StaticMethods.showSnackBar(
                                   'Dáta boli vymazané', context, Colors.green);
                               Navigator.of(context).pop();
                               Navigator.of(context).pop();
@@ -173,6 +138,90 @@ class MainDrawer extends StatelessWidget {
                         ],
                       );
                     });
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(
+                Icons.insert_drive_file_outlined,
+                color: Colors.black54,
+              ),
+              title: const Text('Info k súborom'),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    scrollable: true,
+                    title: const Text('Info k súborom'),
+                    content: const Text(
+                        'Súbory s dátami musia byť v jednom priečinku.\n'
+                        'Tento priečinok je potrebné pri načítaní zvoliť.\n'
+                        '----------\n'
+                        'Súbory musia mať nasledovné názvy:\n'
+                        'nodes.vec\n'
+                        'edges_incid.txt\n'
+                        'edges.atr\n'
+                        'nodes.atr\n'
+                        'nodes_data.txt\n'
+                        'edges_data.txt\n'
+                        '----------\n'
+                        'Potrebné sú 2 súbory:\n'
+                        '1. nodes.vec s formátom:\n'
+                        'ID\n'
+                        'X Y\n'
+                        '\n'
+                        '2. edges_incid.txt s formátom:\n'
+                        'IDhrany IDuzla IDuzla2\n'
+                        '----------\n'
+                        'Súbor edges.atr je voliteľný a obsahuje dĺžky jednotlivých\n'
+                        'hrán s formátom:\n'
+                        'ID DĹŽKA\n'
+                        '----------\n'
+                        'Súbor nodes.atr obsahuje iba ID uzlov, tento súbor je nepovinný.\n'
+                        '----------\n'
+                        'Súbor nodes_data.txt generuje aplikácia pri uložení dát s formátom:\n'
+                        'ID TYPEINDEX CAPACITY NAME\n'
+                        '\n'
+                        'TYPEINDEX:\n'
+                        '0 = primárny zdroj\n'
+                        '1 = zákazník\n'
+                        '2 = možné prekladisko\n'
+                        '3 = nešpecifikované\n'
+                        '----------\n'
+                        'Súbor edges_data.txt generuje aplikácia pri uložení dát s formátom:\n'
+                        'ID ACTIVE\n'
+                        '\n'
+                        'Ak ACTIVE = 1, hrana je aktívna, ak ACTIVE = 0, hrana je deaktivovaná'),
+                    actions: [
+                      TextButton(
+                        child: const Text('Ok'),
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(
+                Icons.info_outline,
+                color: Colors.black54,
+              ),
+              title: const Text('Info'),
+              onTap: () {
+                showAboutDialog(
+                  context: context,
+                  applicationIcon: Image.asset(
+                    'assets/icon.png',
+                    width: 48,
+                  ),
+                  applicationName: 'Optimalizačné algoritmy',
+                  applicationVersion: version,
+                  applicationLegalese: '© 2022 Adam Belianský',
+                );
               },
             ),
           ],

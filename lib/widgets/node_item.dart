@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/models/node.dart';
 import 'package:optimalizacne_algoritmy/screens/node/node_detail_screen.dart';
 
-import '../models/typ_uzla.dart';
+import '../models/node_type.dart';
 import '../screens/node/node_edit_screen.dart';
 
 class NodeItem extends StatelessWidget {
@@ -37,14 +37,14 @@ class NodeItem extends StatelessWidget {
               children: [
                 Flexible(
                   child: Text(
-                    (node.name != null
-                            ? 'Názov: ${node.name.toString()}'
+                    ('Typ: ${Node.getNodeTypeString(node.type)}') +
+                        (node.name != null
+                            ? '  Názov: ${node.name.toString()}'
                             : '') +
-                        (' Typ: ${Node.getNodeTypeString(node.type)}') +
                         (node.capacity != null
-                            ? ' ${node.type == NodeType.zakaznik ? 'Požiadavka' : 'Kapacita'}: ${node.capacity.toString()}'
+                            ? '  ${node.type == NodeType.zakaznik ? 'Požiadavka' : 'Kapacita'}: ${node.capacity.toString()}'
                             : '') +
-                        (node.lat != null ? ' X: ${node.lon.toString()}' : '') +
+                        (node.lat != null ? '  X: ${node.lon.toString()}' : '') +
                         (node.lon != null ? ' Y: ${node.lat.toString()}' : ''),
                   ),
                 ),

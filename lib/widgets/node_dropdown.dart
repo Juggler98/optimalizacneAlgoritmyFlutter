@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:optimalizacne_algoritmy/models/typ_uzla.dart';
+import 'package:optimalizacne_algoritmy/models/node_type.dart';
 
 import '../models/node.dart';
 
@@ -7,7 +7,8 @@ class NodeTypeDropdown extends StatefulWidget {
   final Function changeValue;
   final NodeType type;
 
-  const NodeTypeDropdown(this.changeValue, this.type, {Key key}) : super(key: key);
+  const NodeTypeDropdown(this.changeValue, this.type, {Key key})
+      : super(key: key);
 
   @override
   _NodeTypeDropdownState createState() => _NodeTypeDropdownState();

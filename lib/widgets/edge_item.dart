@@ -39,7 +39,8 @@ class EdgeItem extends StatelessWidget {
                             ' Do: ${edge.to.toString()}' +
                         (edge.length != null
                             ? '   Dĺžka: ${edge.length.toString()}'
-                            : '') + (edge.active ? '  Aktivovaná' : '  Deaktivovaná'),
+                            : '') +
+                        (edge.active ? '   Aktivovaná' : '   Deaktivovaná'),
                   ),
                 ),
               ],

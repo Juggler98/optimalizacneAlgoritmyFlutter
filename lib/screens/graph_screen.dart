@@ -6,7 +6,6 @@ import 'package:optimalizacne_algoritmy/models/twoThreeTree/two_three_tree.dart'
 import '../models/edge.dart' as my_edge;
 
 class GraphScreen extends StatefulWidget {
-
   const GraphScreen({Key key}) : super(key: key);
 
   @override
@@ -37,7 +36,9 @@ class _GraphScreenState extends State<GraphScreen> {
       graphicsNodes.add(Node.Id(uzol.id));
     }
 
-    //graph.addNodes(graphicsNodes.getIntervalData(start, end));
+    if (app.nodesCount < 50) {
+      graph.addNodes(graphicsNodes.getInOrderData());
+    }
 
     for (var uzol in intervalNodes) {
       my_edge.Edge nodeEdge = uzol.edge;

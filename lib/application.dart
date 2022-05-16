@@ -1,10 +1,11 @@
 import 'dart:collection';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:optimalizacne_algoritmy/models/file_result.dart';
 import 'package:optimalizacne_algoritmy/models/twoThreeTree/two_three_tree.dart';
-import 'package:optimalizacne_algoritmy/models/typ_uzla.dart';
+import 'package:optimalizacne_algoritmy/models/node_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/edge.dart';
@@ -41,9 +42,9 @@ class Application with ChangeNotifier {
   void _init() async {
     final prefs = await SharedPreferences.getInstance();
     var path = prefs.getString('path');
-    path ??= 'data';
+    path ??= 'dataTest';
 
-    loadData(path);
+    await loadData(path);
   }
 
   void removeAllData() {
@@ -271,6 +272,7 @@ class Application with ChangeNotifier {
     final fileEdgesData = File('$path/${_fileNames.elementAt(4)}');
     final fileNodesData = File('$path/${_fileNames.elementAt(5)}');
 
+    // ignore: unused_local_variable
     List<String> nodesLines = [];
     List<String> nodesVecLines = [];
     List<String> edgesIncLines = [];
@@ -370,6 +372,10 @@ class Application with ChangeNotifier {
         int from = int.parse(data.elementAt(1).group(0).toString());
         int to = int.parse(data.elementAt(2).group(0).toString());
 
+        if (from == to) {
+          continue;
+        }
+
         double length;
         if (lengthFileExist) {
           final line = edgesLines[i];
@@ -398,9 +404,15 @@ class Application with ChangeNotifier {
           }
         }
 
-        if (from == to) {
-          continue;
+        if (length == null) {
+          final nodeFrom = getNode(from);
+          final nodeTo = getNode(to);
+          if (nodeFrom != null && nodeTo != null) {
+            length = sqrt(pow((nodeFrom.lon - nodeTo.lon), 2) +
+                pow((nodeFrom.lat - nodeTo.lat), 2));
+          }
         }
+
         Edge edge =
             Edge(id: id, from: from, to: to, length: length, active: active);
         _edgesTree.add(edge);
@@ -484,7 +496,7 @@ class Application with ChangeNotifier {
               node.type.index.toString() +
               ' ' +
               (node.capacity == null ? '-1' : node.capacity.toString()) +
-              ' ' +
+              (node.name == null ? '' : ' ') +
               (node.name ?? '') +
               '\n',
           mode: FileMode.append);

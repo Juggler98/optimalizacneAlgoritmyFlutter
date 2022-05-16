@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:optimalizacne_algoritmy/models/typ_uzla.dart';
+import 'package:optimalizacne_algoritmy/models/node_type.dart';
 import 'package:optimalizacne_algoritmy/widgets/node_dropdown.dart';
 
 import '../../application.dart';
 import '../../models/node.dart';
+import '../../static_methods.dart';
 import '../../text_fields/number_textfield.dart';
 import '../../text_fields/string_textfield.dart';
 
@@ -46,7 +47,7 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
 
   void _clearData() {
     setState(() {
-      _name = '';
+      _name = null;
       _x = null;
       _y = null;
       _capacity = null;
@@ -91,12 +92,8 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
   void _save() {
     if (widget.node != null) {
       _app.editNode(widget.node, _name, _capacity, _type);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Uzol bol upravený'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      StaticMethods.showSnackBar('Uzol bol upravený', context, Colors.green,
+          duration: 4);
       Navigator.of(context).pop(true);
     } else {
       final node = Node(
@@ -108,12 +105,8 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
         name: _name,
       );
       _app.addNode(node);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Uzol bol vytvorený'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      StaticMethods.showSnackBar('Uzol bol vytvorený', context, Colors.green,
+          duration: 4);
       _clearData();
     }
   }

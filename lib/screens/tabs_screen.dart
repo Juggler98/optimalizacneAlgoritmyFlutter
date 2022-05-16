@@ -4,6 +4,7 @@ import 'package:optimalizacne_algoritmy/screens/edge/edges_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/graph_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/node/node_edit_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/node/nodes_screen.dart';
+import 'package:optimalizacne_algoritmy/static_methods.dart';
 
 import '../main_drawer.dart';
 
@@ -58,16 +59,21 @@ class _TabsScreenState extends State<TabsScreen>
         title: const Text(
           'Optimalizačné algoritmy',
         ),
-        actions: const [
-          // IconButton(
-          //     icon: const Icon(Icons.refresh),
-          //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          //     tooltip: 'Reload',
-          //     onPressed: () {
-          //       setState(() {
-          //         _selectEvenSamePage(0);
-          //       });
-          //     }),
+        actions: [
+          IconButton(
+              icon: const Icon(Icons.save_outlined),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              tooltip: 'Ulož do priečinka',
+              onPressed: () {
+                StaticMethods.saveData(context);
+              }),
+          IconButton(
+              icon: const Icon(Icons.upload_outlined),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              tooltip: 'Načítaj z priečinka',
+              onPressed: () {
+                StaticMethods.loadData(context);
+              }),
         ],
       ),
       drawer: MainDrawer(),
@@ -81,46 +87,48 @@ class _TabsScreenState extends State<TabsScreen>
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: _selectedPageIndex == 0 ||  _selectedPageIndex == 1 ? FloatingActionButton(
-        tooltip: 'Vytvor',
-        backgroundColor: Colors.blueAccent,
-        child: const Icon(Icons.add, color: Colors.white),
-        onPressed: () {
-          showModalBottomSheet(
-              context: context,
-              builder: (context) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    ListTile(
-                      leading: const Icon(Icons.crop_square),
-                      title: const Text('Nový uzol'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (ctx) => const NodeEditScreen(),
+      floatingActionButton: _selectedPageIndex == 0 || _selectedPageIndex == 1
+          ? FloatingActionButton(
+              tooltip: 'Vytvor',
+              backgroundColor: Colors.blueAccent,
+              child: const Icon(Icons.add, color: Colors.white),
+              onPressed: () {
+                showModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          ListTile(
+                            leading: const Icon(Icons.crop_square),
+                            title: const Text('Nový uzol'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (ctx) => const NodeEditScreen(),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.linear_scale),
-                      title: const Text('Nová hrana'),
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (ctx) => const EdgeEditScreen(),
+                          ListTile(
+                            leading: const Icon(Icons.linear_scale),
+                            title: const Text('Nová hrana'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (ctx) => const EdgeEditScreen(),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
-                  ],
-                );
-              });
-        },
-      ) : null,
+                        ],
+                      );
+                    });
+              },
+            )
+          : null,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         onTap: _selectPage,

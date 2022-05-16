@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:optimalizacne_algoritmy/static_methods.dart';
 
 import '../../application.dart';
 import '../../models/edge.dart';
@@ -68,43 +71,37 @@ class _EdgeEditScreenState extends State<EdgeEditScreen> {
   void _save() {
     if (widget.edge != null) {
       _app.editEdge(widget.edge, _length, _active);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Hrana bola upravená'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      StaticMethods.showSnackBar('Hrana bola upravená', context, Colors.green,
+          duration: 4);
       Navigator.of(context).pop(true);
     } else {
       if (_app.getNode(_from) == null) {
-        _showSnackBar('Uzol \'Od\' neexistuje');
+        StaticMethods.showSnackBar(
+            'Uzol \'Od\' neexistuje', context, Colors.red,
+            duration: 4);
         return;
       }
       if (_app.getNode(_to) == null) {
-        _showSnackBar('Uzol \'Do\' neexistuje');
+        StaticMethods.showSnackBar(
+            'Uzol \'Do\' neexistuje', context, Colors.red,
+            duration: 4);
         return;
+      }
+      if (_length == null) {
+        final nodeFrom = _app.getNode(_from);
+        final nodeTo = _app.getNode(_to);
+        if (nodeFrom != null && nodeTo != null) {
+          _length = sqrt(pow((nodeFrom.lon - nodeTo.lon), 2) +
+              pow((nodeFrom.lat - nodeTo.lat), 2));
+        }
       }
       final edge =
           Edge(id: _app.edgesCount, from: _from, to: _to, length: _length);
       _app.addEdge(edge);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Hrana bola vytvorená'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      StaticMethods.showSnackBar('Hrana bola vytvorená', context, Colors.green,
+          duration: 4);
       _clearData();
     }
-  }
-
-  void _showSnackBar(String text) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(text),
-        backgroundColor: Theme.of(context).errorColor,
-      ),
-    );
   }
 
   @override

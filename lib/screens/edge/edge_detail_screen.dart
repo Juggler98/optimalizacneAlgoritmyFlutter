@@ -35,6 +35,7 @@ class _EdgeDetailScreenState extends State<EdgeDetailScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             tooltip: 'Uprav',
             onPressed: () {
               Navigator.of(context)
@@ -54,6 +55,7 @@ class _EdgeDetailScreenState extends State<EdgeDetailScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.delete_forever),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             tooltip: 'Vymaž',
             onPressed: () {
               showDialog(

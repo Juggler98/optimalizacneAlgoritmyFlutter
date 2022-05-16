@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'two_three_tree_node.dart';
 import 'two_three_tree_son_type.dart';
 
+//Implementovane na predmete Algoritmy a udajove struktury 2
 class TTTree<K extends Comparable<K>, T extends Comparable<T>> {
   TTTreeNode<K, T> _root;
   var _size = 0;
@@ -16,7 +17,7 @@ class TTTree<K extends Comparable<K>, T extends Comparable<T>> {
   */
   bool add(T newData) {
     if (!_tryToAdd(newData)) {
-      //print("Nepodarilo sa vlozit kluc: " + newData.getKey().toString()); //TODO: Remove it
+      //print("Nepodarilo sa vlozit kluc: " + newData.getKey().toString());
       return false;
     }
     ++_size;
