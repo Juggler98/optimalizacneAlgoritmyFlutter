@@ -35,7 +35,7 @@ class _EdgesScreenState extends State<EdgesScreen>
                             padding: const EdgeInsets.all(16.0),
                             child: Center(
                               child: Text(
-                                'Žiadne uzly',
+                                'Žiadne hrany',
                                 style: Theme.of(context).textTheme.headline6,
                               ),
                             ),

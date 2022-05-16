@@ -2,9 +2,10 @@ import 'dart:collection';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:optimalizacne_algoritmy/models/file_result.dart';
 import 'package:optimalizacne_algoritmy/models/twoThreeTree/two_three_tree.dart';
 import 'package:optimalizacne_algoritmy/models/typ_uzla.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/edge.dart';
 import 'models/node.dart';
@@ -21,146 +22,36 @@ class Application with ChangeNotifier {
   }
 
   final _fileNames = {
-    "test_edges.atr",
-    "test_edges_incid.txt",
-    "test_nodes.atr",
-    "test_nodes.vec",
+    "edges.atr",
+    "edges_incid.txt",
+    "nodes.atr",
+    "nodes.vec",
+    "edges_data.txt",
+    "nodes_data.txt",
   };
 
-  final _fileNamesSR = {
-    "SR_edges.atr",
-    "SR_edges_incid.txt",
-    "SR_nodes.atr",
-    "SR_nodes.vec",
-  };
-
-  var nodesCount = -1;
+  var nodesCount = 1;
   var edgesCount = 1;
 
-  final TTTree<num, Node> _nodesTree = TTTree();
-  final TTTree<num, Edge> _edgesTree = TTTree();
+  TTTree<num, Node> _nodesTree = TTTree();
+  TTTree<num, Edge> _edgesTree = TTTree();
 
   var loading = true;
 
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
+  void _init() async {
+    final prefs = await SharedPreferences.getInstance();
+    var path = prefs.getString('path');
+    path ??= 'data';
+
+    loadData(path);
   }
 
-  void _init() async {
-    bool testovaciaSiet = true;
-    Set<String> fileNames;
-    if (testovaciaSiet) {
-      fileNames = _fileNames;
-    } else {
-      fileNames = _fileNamesSR;
-    }
-
-    var path = '';
-    if (Platform.isAndroid) {
-      path = await _localPath + '/';
-    }
-
-    final scEdges = File(path + fileNames.elementAt(0));
-    final scEdgesInc = File(path + fileNames.elementAt(1));
-    final scNodes = File(path + fileNames.elementAt(2));
-    final scNodesVec = File(path + fileNames.elementAt(3));
-
-    List<String> scNodesLines = [];
-    List<String> scNodesVecLines = [];
-    List<String> scEdgesIncLines = [];
-    List<String> scEdgesLines = [];
-    try {
-      scNodesLines = await scNodes.readAsLines();
-      scNodesVecLines = await scNodesVec.readAsLines();
-      scEdgesIncLines = await scEdgesInc.readAsLines();
-      scEdgesLines = await scEdges.readAsLines();
-    } catch (e) {
-      if (kDebugMode) {
-        print('error files');
-      }
-      return;
-    }
-
-    bool startsFromZero = false;
-    for (var line in scNodesLines) {
-      if (nodesCount == 0) {
-        startsFromZero = true;
-      }
-      nodesCount = int.parse(line);
-      //print(_nodesCount);
-    }
-
-    if (startsFromZero) {
-      nodesCount++;
-    }
-    if (kDebugMode) {
-      print("Pocet vrcholov: " + nodesCount.toString());
-    }
-
-    for (int i = 0; i < nodesCount; i++) {
-      _nodesTree.add(Node(id: i));
-    }
-
-    final intInStr = RegExp(r'\d+\.?\d*');
-    for (int i = 0; i < scNodesVecLines.length; i = i + 2) {
-      var line = scNodesVecLines.elementAt(i);
-      var data = line.split(' ');
-      int id = int.parse(data.first);
-      id = startsFromZero ? id : id - 1;
-
-      line = scNodesVecLines.elementAt(i + 1).trim();
-      var data2 = intInStr.allMatches(line);
-      double lon = double.parse(data2.first.group(0).toString());
-      double lat = double.parse(data2.elementAt(1).group(0).toString());
-
-      final uzol = _nodesTree.search(Node(id: id));
-      uzol.lat = lat;
-      uzol.lon = lon;
-    }
-
-    /*
-         * Inicializacia dynamickej doprednej hviezdy
-        */
-    for (int i = 0; i < scEdgesIncLines.length; i++) {
-      var line = scEdgesIncLines.elementAt(i);
-      var data = intInStr.allMatches(line);
-      int id = int.parse(data.elementAt(0).group(0).toString());
-      int from = int.parse(data.elementAt(1).group(0).toString());
-      from = startsFromZero ? from : from - 1;
-      int to = int.parse(data.elementAt(2).group(0).toString());
-      to = startsFromZero ? to : to - 1;
-
-      var line2 = scEdgesLines.elementAt(i);
-      var data2 = line2.split(' ');
-      int id2 = int.parse(data2.elementAt(0));
-      double length = double.parse(data2.elementAt(1));
-      if (id != id2) {
-        throw Exception('This should not happened');
-      }
-      if (from == to) {
-        continue;
-      }
-      Edge edge = Edge(id: id, from: from, to: to, length: length);
-      _edgesTree.add(edge);
-      edgesCount++;
-
-      _initDoprednaHviezda(edge);
-    }
-
-    if (kDebugMode) {
-      print("Pocet hran: " + _edgesTree.getSize().toString());
-    }
-
-    loading = false;
+  void removeAllData() {
+    _nodesTree = TTTree();
+    _edgesTree = TTTree();
+    nodesCount = 1;
+    edgesCount = 1;
     notifyListeners();
-
-    //vypisHranyPreVrcholy(-1);
-
-    //_hrany.clear();
-    //_uzly.clear();
-
-    //printDistance(1, 6, false);
   }
 
   void _reload() {
@@ -368,6 +259,235 @@ class Application with ChangeNotifier {
       if (kDebugMode) {
         print("${d[i]}, ");
       }
+    }
+  }
+
+  Future<FileResult> loadData(String path) async {
+    final fileEdges = File('$path/${_fileNames.elementAt(0)}');
+    final fileEdgesInc = File('$path/${_fileNames.elementAt(1)}');
+    final fileNodes = File('$path/${_fileNames.elementAt(2)}');
+    final fileNodesVec = File('$path/${_fileNames.elementAt(3)}');
+
+    final fileEdgesData = File('$path/${_fileNames.elementAt(4)}');
+    final fileNodesData = File('$path/${_fileNames.elementAt(5)}');
+
+    List<String> nodesLines = [];
+    List<String> nodesVecLines = [];
+    List<String> edgesIncLines = [];
+    List<String> edgesLines = [];
+
+    List<String> edgesDataLines = [];
+    List<String> nodesDataLines = [];
+
+    final lengthFileExist = await fileEdges.exists();
+    final nodesFileExist = await fileNodes.exists();
+
+    final edgesDataFileExist = await fileEdgesData.exists();
+    final nodesDataFileExist = await fileNodesData.exists();
+
+    try {
+      if (nodesFileExist) {
+        nodesLines = await fileNodes.readAsLines();
+      }
+      nodesVecLines = await fileNodesVec.readAsLines();
+      edgesIncLines = await fileEdgesInc.readAsLines();
+      if (lengthFileExist) {
+        edgesLines = await fileEdges.readAsLines();
+      }
+      if (edgesDataFileExist) {
+        edgesDataLines = await fileEdgesData.readAsLines();
+      }
+      if (nodesDataFileExist) {
+        nodesDataLines = await fileNodesData.readAsLines();
+      }
+    } catch (e) {
+      loading = false;
+      notifyListeners();
+      if (kDebugMode) {
+        print(FileResult.fileNotExist);
+      }
+      return FileResult.fileNotExist;
+    }
+
+    final intInStr = RegExp(r'\d+\.?\d*');
+    for (int i = 0; i < nodesVecLines.length; i = i + 2) {
+      var line = nodesVecLines[i];
+      var data = line.split(' ');
+      int id = int.parse(data.first);
+
+      final node = Node(id: id);
+      _nodesTree.add(node);
+      nodesCount++;
+
+      line = nodesVecLines[i + 1].trim();
+      var data2 = intInStr.allMatches(line);
+      if (data2.length < 2) {
+        loading = false;
+        notifyListeners();
+        if (kDebugMode) {
+          print(FileResult.notCoordinate);
+        }
+        return FileResult.notCoordinate;
+      }
+      double lon = double.parse(data2.first.group(0).toString());
+      double lat = double.parse(data2.elementAt(1).group(0).toString());
+
+      node.lat = lat;
+      node.lon = lon;
+
+      if (nodesDataFileExist &&
+          nodesVecLines.length / 2 == nodesDataLines.length) {
+        final line = nodesDataLines[i ~/ 2];
+        final data = line.split(' ');
+        node.type = NodeType.values.elementAt(int.parse(data.elementAt(1)));
+        if (double.parse(data.elementAt(2)) >= 0) {
+          node.capacity = double.parse(data.elementAt(2));
+        }
+        if (data.length > 3) {
+          node.name = data.elementAt(3);
+        }
+      }
+    }
+
+    if (kDebugMode) {
+      print("Pocet vrcholov: " + (nodesCount - 1).toString());
+    }
+
+    //Inicializacia hran a dynamickej doprednej hviezdy
+    try {
+      for (int i = 0; i < edgesIncLines.length; i++) {
+        final line = edgesIncLines[i];
+        final data = intInStr.allMatches(line);
+        int id = int.parse(data.elementAt(0).group(0).toString());
+        if (data.length < 3) {
+          loading = false;
+          notifyListeners();
+          if (kDebugMode) {
+            print(FileResult.notIncident);
+          }
+          return FileResult.notIncident;
+        }
+        int from = int.parse(data.elementAt(1).group(0).toString());
+        int to = int.parse(data.elementAt(2).group(0).toString());
+
+        double length;
+        if (lengthFileExist) {
+          final line = edgesLines[i];
+          final data = line.split(' ');
+          int id2 = int.parse(data.elementAt(0));
+          if (data.length > 1) {
+            length = double.parse(data.elementAt(1));
+          }
+          if (id != id2) {
+            loading = false;
+            notifyListeners();
+            if (kDebugMode) {
+              print(FileResult.idIsNotId2);
+            }
+            return FileResult.idIsNotId2;
+          }
+        }
+
+        var active = true;
+        if (edgesDataFileExist &&
+            edgesIncLines.length == edgesDataLines.length) {
+          final line = edgesDataLines[i];
+          final data = line.split(' ');
+          if (int.parse(data.elementAt(1)) == 0) {
+            active = false;
+          }
+        }
+
+        if (from == to) {
+          continue;
+        }
+        Edge edge =
+            Edge(id: id, from: from, to: to, length: length, active: active);
+        _edgesTree.add(edge);
+        edgesCount++;
+
+        _initDoprednaHviezda(edge);
+      }
+    } catch (e) {
+      loading = false;
+      notifyListeners();
+      if (kDebugMode) {
+        print(FileResult.incidentCountLength);
+      }
+      return FileResult.incidentCountLength;
+    }
+
+    if (kDebugMode) {
+      print("Pocet hran: " + _edgesTree.getSize().toString());
+    }
+
+    loading = false;
+    notifyListeners();
+
+    //vypisHranyPreVrcholy(-1);
+
+    //printDistance(1, 6, false);
+
+    return FileResult.correct;
+  }
+
+  Future<void> writeToDirectory(String path) async {
+    final fileEdgesAtr = File('$path/${_fileNames.elementAt(0)}');
+    final fileEdgesIncid = File('$path/${_fileNames.elementAt(1)}');
+    final fileNodesAtr = File('$path/${_fileNames.elementAt(2)}');
+    final fileNodesVec = File('$path/${_fileNames.elementAt(3)}');
+    final fileEdgesData = File('$path/${_fileNames.elementAt(4)}');
+    final fileNodesData = File('$path/${_fileNames.elementAt(5)}');
+
+    await fileEdgesAtr.writeAsString('');
+    await fileEdgesIncid.writeAsString('');
+    await fileNodesAtr.writeAsString('');
+    await fileNodesVec.writeAsString('');
+    await fileEdgesData.writeAsString('');
+    await fileNodesData.writeAsString('');
+
+    for (var edge in _edgesTree.getInOrderData()) {
+      await fileEdgesAtr.writeAsString(
+          edge.id.toString() + ' ' + edge.length.toString() + '\n',
+          mode: FileMode.append);
+
+      await fileEdgesIncid.writeAsString(
+          edge.id.toString() +
+              ' ' +
+              edge.from.toString() +
+              ' ' +
+              edge.to.toString() +
+              '\n',
+          mode: FileMode.append);
+
+      await fileEdgesData.writeAsString(
+          edge.id.toString() + (edge.active ? ' 1' : ' 0') + '\n',
+          mode: FileMode.append);
+    }
+
+    for (var node in _nodesTree.getInOrderData()) {
+      await fileNodesAtr.writeAsString(node.id.toString() + '\n',
+          mode: FileMode.append);
+
+      await fileNodesVec.writeAsString(
+          node.id.toString() +
+              ' 1\n ' +
+              node.lon.toString() +
+              ' ' +
+              node.lat.toString() +
+              '\n',
+          mode: FileMode.append);
+
+      await fileNodesData.writeAsString(
+          node.id.toString() +
+              ' ' +
+              node.type.index.toString() +
+              ' ' +
+              (node.capacity == null ? '-1' : node.capacity.toString()) +
+              ' ' +
+              (node.name ?? '') +
+              '\n',
+          mode: FileMode.append);
     }
   }
 }

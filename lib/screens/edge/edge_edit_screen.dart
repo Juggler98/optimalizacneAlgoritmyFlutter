@@ -71,16 +71,17 @@ class _EdgeEditScreenState extends State<EdgeEditScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Hrana bola upravená'),
+          backgroundColor: Colors.green,
         ),
       );
       Navigator.of(context).pop(true);
     } else {
       if (_app.getNode(_from) == null) {
-        _showScaffold('Uzol \'Od\' neexistuje');
+        _showSnackBar('Uzol \'Od\' neexistuje');
         return;
       }
       if (_app.getNode(_to) == null) {
-        _showScaffold('Uzol \'Do\' neexistuje');
+        _showSnackBar('Uzol \'Do\' neexistuje');
         return;
       }
       final edge =
@@ -89,13 +90,14 @@ class _EdgeEditScreenState extends State<EdgeEditScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Hrana bola vytvorená'),
+          backgroundColor: Colors.green,
         ),
       );
       _clearData();
     }
   }
 
-  void _showScaffold(String text) {
+  void _showSnackBar(String text) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

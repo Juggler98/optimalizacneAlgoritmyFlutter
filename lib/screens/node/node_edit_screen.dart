@@ -94,6 +94,7 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Uzol bol upravený'),
+          backgroundColor: Colors.green,
         ),
       );
       Navigator.of(context).pop(true);
@@ -110,6 +111,7 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Uzol bol vytvorený'),
+          backgroundColor: Colors.green,
         ),
       );
       _clearData();

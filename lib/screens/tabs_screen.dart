@@ -5,6 +5,8 @@ import 'package:optimalizacne_algoritmy/screens/graph_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/node/node_edit_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/node/nodes_screen.dart';
 
+import '../main_drawer.dart';
+
 class TabsScreen extends StatefulWidget {
   const TabsScreen({Key key}) : super(key: key);
 
@@ -68,7 +70,7 @@ class _TabsScreenState extends State<TabsScreen>
           //     }),
         ],
       ),
-      // drawer: const MainDrawer(),
+      drawer: MainDrawer(),
       body: Stack(
         children: [
           PageView(
