@@ -4,12 +4,14 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:optimalizacne_algoritmy/models/file_result.dart';
-import 'package:optimalizacne_algoritmy/models/twoThreeTree/two_three_tree.dart';
+import 'package:optimalizacne_algoritmy/models/two_three_tree/two_three_tree.dart';
 import 'package:optimalizacne_algoritmy/models/node_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'models/clarke_wright/clark_wright_algorithm.dart';
 import 'models/edge.dart';
 import 'models/node.dart';
+import 'models/clarke_wright/saving.dart';
 
 class Application with ChangeNotifier {
   static final Application _singleton = Application._internal();
@@ -31,13 +33,16 @@ class Application with ChangeNotifier {
     "nodes_data.txt",
   };
 
-  var nodesCount = 1;
-  var edgesCount = 1;
+  var nodesCountSequence = 1;
+  var edgesCountSequence = 1;
 
   TTTree<num, Node> _nodesTree = TTTree();
   TTTree<num, Edge> _edgesTree = TTTree();
 
+  List<List<double>> _distanceMatrix;
+
   var loading = true;
+  var startZero = false;
 
   void _init() async {
     final prefs = await SharedPreferences.getInstance();
@@ -45,13 +50,16 @@ class Application with ChangeNotifier {
     path ??= 'dataTest';
 
     await loadData(path);
+
+    test();
   }
 
   void removeAllData() {
     _nodesTree = TTTree();
     _edgesTree = TTTree();
-    nodesCount = 1;
-    edgesCount = 1;
+    _distanceMatrix = null;
+    nodesCountSequence = 1;
+    edgesCountSequence = 1;
     notifyListeners();
   }
 
@@ -125,13 +133,13 @@ class Application with ChangeNotifier {
 
   void addNode(Node node) {
     _nodesTree.add(node);
-    nodesCount++;
+    nodesCountSequence++;
     notifyListeners();
   }
 
   void addEdge(Edge edge) {
     _edgesTree.add(edge);
-    edgesCount++;
+    edgesCountSequence++;
     _reload();
   }
 
@@ -176,7 +184,15 @@ class Application with ChangeNotifier {
     return _nodesTree.getSize() == 0;
   }
 
-  void vypisHranyPreVrcholy(int pocet) {
+  int get nodesCount {
+    return _nodesTree.getSize();
+  }
+
+  int get edgesCount {
+    return _edgesTree.getSize();
+  }
+
+  void printEdgesForNodes(int pocet) {
     if (pocet == -1) {
       pocet = nodesCount;
     }
@@ -189,7 +205,9 @@ class Application with ChangeNotifier {
       }
       Edge nodeEdge = uzol.edge;
       while (nodeEdge != null) {
-        nodeEdge.vypis();
+        if (kDebugMode) {
+          print(nodeEdge);
+        }
         nodeEdge = nodeEdge.getNextEdge(uzol.id);
       }
     }
@@ -198,16 +216,16 @@ class Application with ChangeNotifier {
   /// @param from      Zaciatocny Vrchol
   /// @param p         Pole predchodcov
   /// @return Pole vzdialenosti z vrcholu from do vsetkych ostatnych vrcholov
-  List<double> _getDistances(int from) {
+  List<double> getDistances(int from) {
     List<double> d = List.generate(_nodesTree.getSize(), (_) => double.infinity,
-        growable: false);
-    d[from] = 0;
+        growable: true);
+    d[startZero ? from : from - 1] = 0;
 
     Queue<int> queue = Queue();
     Queue<int> queue2 = Queue();
 
     queue.add(from);
-    int pocetVyberani = 0;
+    var pocetVyberani = 0;
     while (queue.isNotEmpty || queue2.isNotEmpty) {
       int nodeFrom;
       if (queue2.isNotEmpty) {
@@ -216,13 +234,15 @@ class Application with ChangeNotifier {
         nodeFrom = queue.removeFirst();
       }
       pocetVyberani++;
-      final uzol = _nodesTree.search(Node(id: nodeFrom));
-      Edge nodeEdge = uzol.edge;
+      final node = _nodesTree.search(Node(id: nodeFrom));
+      Edge nodeEdge = node.edge;
       while (nodeEdge != null) {
         int nodeTo = nodeEdge.getTo(nodeFrom);
-        if (d[nodeFrom] + nodeEdge.length < d[nodeTo]) {
-          double oldValue = d[nodeTo];
-          d[nodeTo] = d[nodeFrom] + nodeEdge.length;
+        if (d[startZero ? nodeFrom : nodeFrom - 1] + nodeEdge.length <
+            d[startZero ? nodeTo : nodeTo - 1]) {
+          double oldValue = d[startZero ? nodeTo : nodeTo - 1];
+          d[startZero ? nodeTo : nodeTo - 1] =
+              d[startZero ? nodeFrom : nodeFrom - 1] + nodeEdge.length;
           if (oldValue != double.infinity) {
             queue2.add(nodeTo);
           } else {
@@ -233,34 +253,89 @@ class Application with ChangeNotifier {
       }
     }
     if (kDebugMode) {
-      print("\nPocet vyberani: $pocetVyberani");
+      //print("\nPocet vyberani: $pocetVyberani");
     }
     return d;
+  }
+
+  List<List<double>> get distanceMatrix {
+    if (_distanceMatrix != null) {
+      return _distanceMatrix;
+    }
+    final matrix = List.generate(_nodesTree.getSize(),
+        (_) => List.generate(_nodesTree.getSize(), (_) => 0.0, growable: false),
+        growable: false);
+
+    var index = 0;
+    for (var node in _nodesTree.getInOrderData()) {
+      matrix[index++] = getDistances(node.id);
+    }
+
+    for (int i = 0; i < matrix.length; i++) {
+      if (kDebugMode) {
+        print(matrix[i]);
+      }
+    }
+    _distanceMatrix = matrix;
+    return matrix;
+  }
+
+  void clarkWrightAlgorithm(int centre, double maxCapacity) {
+    final a = ClarkWrightAlgorithm(
+        centre: startZero ? centre : centre + 1, maxCapacity: maxCapacity);
+    a.calculate();
   }
 
   /// @param from       Zaciatocny Vrchol
   /// @param to         Koncovy vrchol
   /// @param postupnost Ak true, tak sa zobrazi aj postupnost trasy
   void printDistance(int from, int to, bool postupnost) async {
-    final d = _getDistances(from);
+    final d = getDistances(from);
     if (kDebugMode) {
       print("$from -> $to, Dlzka: ${d[to]}");
     }
   }
 
-  void printAllDistances(int from, int count) async {
-    final d = _getDistances(from);
+  void printAllDistances(int from, {int count}) async {
+    var d = getDistances(from);
     if (kDebugMode) {
       print("Vzdialenost z vrchola $from do $count vrcholov: ");
     }
-    if (count == -1) {
-      count = d.length;
-    }
+    count ??= d.length;
+    var text = '';
     for (int i = 0; i < count; i++) {
-      if (kDebugMode) {
-        print("${d[i]}, ");
-      }
+      text += '${d[i]}, ';
     }
+    if (kDebugMode) {
+      print(text);
+    }
+  }
+
+  void test() {
+    clarkWrightAlgorithm(1, 20);
+  }
+
+  void test2() {
+    var max = double.minPositive;
+    var max2 = double.minPositive;
+    TTTree<num, Node> thee = TTTree();
+    for (int i = 0; i < 1000; i++) {
+      final node = Node(id: Random().nextInt(5000));
+      if (node.id > max) {
+        max2 = max;
+        max = node.id * 1.0;
+      }
+      if (node.id > max2 && node.id < max) {
+        max2 = node.id * 1.0;
+      }
+      thee.add(node);
+    }
+    print(max);
+    print(max2);
+    print('---');
+    print(thee.getMaxData().id);
+    thee.removeMaxData();
+    print(thee.getMaxData().id);
   }
 
   Future<FileResult> loadData(String path) async {
@@ -322,9 +397,13 @@ class Application with ChangeNotifier {
         var data = line.split(' ');
         int id = int.parse(data.first);
 
+        if (id == 0) {
+          startZero = true;
+        }
+
         final node = Node(id: id);
         _nodesTree.add(node);
-        nodesCount++;
+        nodesCountSequence++;
 
         line = nodesVecLines[i + 1].trim();
         var data2 = intInStr.allMatches(line);
@@ -430,7 +509,7 @@ class Application with ChangeNotifier {
         Edge edge =
             Edge(id: id, from: from, to: to, length: length, active: active);
         _edgesTree.add(edge);
-        edgesCount++;
+        edgesCountSequence++;
 
         _initDoprednaHviezda(edge);
       }
@@ -453,7 +532,7 @@ class Application with ChangeNotifier {
 
     //vypisHranyPreVrcholy(-1);
 
-    //printDistance(1, 6, false);
+    // printDistance(0, 1, false);
 
     return FileResult.correct;
   }

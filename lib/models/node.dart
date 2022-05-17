@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:optimalizacne_algoritmy/models/edge.dart';
 import 'package:optimalizacne_algoritmy/models/node_type.dart';
@@ -10,26 +12,18 @@ class Node implements Comparable<Node> {
   Edge edge;
   double lat;
   double lon;
+  int routesPosition;
 
   Node({
     @required this.id,
     this.name,
     this.type = NodeType.nespecifikovane,
-    this.capacity,
+    this.capacity = 5,
     this.edge,
     this.lat,
     this.lon,
+    this.routesPosition,
   });
-
-  void vypis() {
-    if (kDebugMode) {
-      print("Node{" "id=" + id.toString() +
-        ", lat=" + lat.toString() +
-        ", lon=" + lon.toString() +
-        ", edge=" + edge.toString() +
-        '}');
-    }
-  }
 
   static String getNodeTypeString(NodeType type) {
     switch (type) {
@@ -49,5 +43,18 @@ class Node implements Comparable<Node> {
   @override
   int compareTo(Node other) {
     return id.compareTo(other.id);
+  }
+
+  @override
+  String toString() {
+    return "Node{" "id=" +
+        id.toString() +
+        ", lat=" +
+        lat.toString() +
+        ", lon=" +
+        lon.toString() +
+        ", edge=" +
+        edge.toString() +
+        '}';
   }
 }

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:optimalizacne_algoritmy/application.dart';
-import 'package:optimalizacne_algoritmy/models/twoThreeTree/two_three_tree.dart';
 
 import '../models/edge.dart' as my_edge;
+import '../models/two_three_tree/two_three_tree.dart';
 
 class GraphScreen extends StatefulWidget {
   const GraphScreen({Key key}) : super(key: key);

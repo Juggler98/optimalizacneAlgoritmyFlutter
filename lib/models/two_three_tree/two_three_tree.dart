@@ -346,6 +346,24 @@ class TTTree<K extends Comparable<K>, T extends Comparable<T>> {
     return data;
   }
 
+  T getMaxData() {
+    var current = _root;
+    if (current == null) {
+      return null;
+    }
+    while (current.hasRightSon()) {
+      current = current.getRightSon();
+    }
+    if (current.hasDataR()) {
+      return current.getDataR();
+    }
+    return current.getDataL();
+  }
+
+  T removeMaxData() {
+    return remove(getMaxData());
+  }
+
   /*
     Len pre testove ucely.
    */

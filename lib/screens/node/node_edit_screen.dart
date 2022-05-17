@@ -97,7 +97,7 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
       Navigator.of(context).pop(true);
     } else {
       final node = Node(
-        id: _app.nodesCount,
+        id: _app.nodesCountSequence,
         lon: _x,
         lat: _y,
         capacity: _capacity,

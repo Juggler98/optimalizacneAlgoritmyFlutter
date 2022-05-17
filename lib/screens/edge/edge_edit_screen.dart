@@ -96,7 +96,7 @@ class _EdgeEditScreenState extends State<EdgeEditScreen> {
         }
       }
       final edge =
-          Edge(id: _app.edgesCount, from: _from, to: _to, length: _length);
+          Edge(id: _app.edgesCountSequence, from: _from, to: _to, length: _length);
       _app.addEdge(edge);
       StaticMethods.showSnackBar('Hrana bola vytvorená', context, Colors.green,
           duration: 4);
