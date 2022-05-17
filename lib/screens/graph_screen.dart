@@ -32,23 +32,23 @@ class _GraphScreenState extends State<GraphScreen> {
         app.nodesCount > 20 ? app.getIntervalNodes(0, 20) : app.allNodes;
     final allNodes = app.allNodes;
 
-    for (var uzol in allNodes) {
-      graphicsNodes.add(Node.Id(uzol.id));
+    for (var node in allNodes) {
+      graphicsNodes.add(Node.Id(node.id));
     }
 
     if (app.nodesCount < 50) {
       graph.addNodes(graphicsNodes.getInOrderData());
     }
 
-    for (var uzol in intervalNodes) {
-      my_edge.Edge nodeEdge = uzol.edge;
+    for (var node in intervalNodes) {
+      my_edge.Edge nodeEdge = node.edge;
       while (nodeEdge != null) {
         if (nodeEdge.active) {
           final node1 = graphicsNodes.search(Node.Id(nodeEdge.from));
           final node2 = graphicsNodes.search(Node.Id(nodeEdge.to));
           graph.addEdge(node1, node2);
         }
-        nodeEdge = nodeEdge.getNextEdge(uzol.id);
+        nodeEdge = nodeEdge.getNextEdge(node.id);
       }
     }
 

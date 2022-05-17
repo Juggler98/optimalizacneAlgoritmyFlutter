@@ -93,6 +93,7 @@ class _EdgeEditScreenState extends State<EdgeEditScreen> {
         if (nodeFrom != null && nodeTo != null) {
           _length = sqrt(pow((nodeFrom.lon - nodeTo.lon), 2) +
               pow((nodeFrom.lat - nodeTo.lat), 2));
+          _length /= 10; //TODO: Divide because of test network format
         }
       }
       final edge =

@@ -69,7 +69,9 @@ class ClarkWrightAlgorithm {
 
     while (_savings.getSize() != 0) {
       final sav = _savings.removeMaxData();
-      print(sav);
+      if (kDebugMode) {
+        print(sav);
+      }
       _join(sav);
     }
     routes.removeWhere((list) => list.isEmpty);

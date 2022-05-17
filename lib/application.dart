@@ -11,7 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'models/clarke_wright/clark_wright_algorithm.dart';
 import 'models/edge.dart';
 import 'models/node.dart';
-import 'models/clarke_wright/saving.dart';
 
 class Application with ChangeNotifier {
   static final Application _singleton = Application._internal();
@@ -40,6 +39,7 @@ class Application with ChangeNotifier {
   TTTree<num, Edge> _edgesTree = TTTree();
 
   List<List<double>> _distanceMatrix;
+  List<List<int>> _predecessorsMatrix;
 
   var loading = true;
   var startZero = false;
@@ -67,19 +67,19 @@ class Application with ChangeNotifier {
     loading = true;
     notifyListeners();
 
-    for (var uzol in _nodesTree.getInOrderData()) {
-      uzol.edge = null;
+    for (var node in _nodesTree.getInOrderData()) {
+      node.edge = null;
     }
 
-    final hrany = _edgesTree.getInOrderData();
+    final edges = _edgesTree.getInOrderData();
 
-    for (var hrana in hrany) {
-      hrana.nextEdgeFrom = null;
-      hrana.nextEdgeTo = null;
+    for (var edge in edges) {
+      edge.nextEdgeFrom = null;
+      edge.nextEdgeTo = null;
     }
 
-    for (var hrana in hrany) {
-      _initDoprednaHviezda(hrana);
+    for (var edge in edges) {
+      _initDoprednaHviezda(edge);
     }
 
     loading = false;
@@ -198,17 +198,17 @@ class Application with ChangeNotifier {
     }
 
     var count = 0;
-    for (var uzol in _nodesTree.getIntervalData(Node(id: 0), Node(id: pocet))) {
+    for (var node in _nodesTree.getIntervalData(Node(id: 0), Node(id: pocet))) {
       count++;
       if (kDebugMode) {
         print("NODE: " + count.toString());
       }
-      Edge nodeEdge = uzol.edge;
+      Edge nodeEdge = node.edge;
       while (nodeEdge != null) {
         if (kDebugMode) {
           print(nodeEdge);
         }
-        nodeEdge = nodeEdge.getNextEdge(uzol.id);
+        nodeEdge = nodeEdge.getNextEdge(node.id);
       }
     }
   }
@@ -216,15 +216,17 @@ class Application with ChangeNotifier {
   /// @param from      Zaciatocny Vrchol
   /// @param p         Pole predchodcov
   /// @return Pole vzdialenosti z vrcholu from do vsetkych ostatnych vrcholov
-  List<double> getDistances(int from) {
+  List<double> getDistances(int from, {List<int> p}) {
     List<double> d = List.generate(_nodesTree.getSize(), (_) => double.infinity,
-        growable: true);
+        growable: false);
+
     d[startZero ? from : from - 1] = 0;
 
     Queue<int> queue = Queue();
     Queue<int> queue2 = Queue();
 
     queue.add(from);
+    // ignore: unused_local_variable
     var pocetVyberani = 0;
     while (queue.isNotEmpty || queue2.isNotEmpty) {
       int nodeFrom;
@@ -238,15 +240,21 @@ class Application with ChangeNotifier {
       Edge nodeEdge = node.edge;
       while (nodeEdge != null) {
         int nodeTo = nodeEdge.getTo(nodeFrom);
-        if (d[startZero ? nodeFrom : nodeFrom - 1] + nodeEdge.length <
-            d[startZero ? nodeTo : nodeTo - 1]) {
-          double oldValue = d[startZero ? nodeTo : nodeTo - 1];
-          d[startZero ? nodeTo : nodeTo - 1] =
-              d[startZero ? nodeFrom : nodeFrom - 1] + nodeEdge.length;
-          if (oldValue != double.infinity) {
-            queue2.add(nodeTo);
-          } else {
-            queue.add(nodeTo);
+        if (nodeEdge.active) {
+          if (d[startZero ? nodeFrom : nodeFrom - 1] + nodeEdge.length <
+              d[startZero ? nodeTo : nodeTo - 1]) {
+            double oldValue = d[startZero ? nodeTo : nodeTo - 1];
+            d[startZero ? nodeTo : nodeTo - 1] =
+                d[startZero ? nodeFrom : nodeFrom - 1] + nodeEdge.length;
+            if (p != null) {
+              p[startZero ? nodeTo : nodeTo - 1] =
+                  startZero ? nodeFrom : nodeFrom - 1;
+            }
+            if (oldValue != double.infinity) {
+              queue2.add(nodeTo);
+            } else {
+              queue.add(nodeTo);
+            }
           }
         }
         nodeEdge = nodeEdge.getNextEdge(nodeFrom);
@@ -280,19 +288,66 @@ class Application with ChangeNotifier {
     return matrix;
   }
 
+  List<List<int>> get predecessorsMatrix {
+    if (_predecessorsMatrix != null) {
+      return _predecessorsMatrix;
+    }
+
+    List<List<int>> matrix = List.generate(_nodesTree.getSize(),
+        (_) => List.generate(_nodesTree.getSize(), (_) => -1, growable: false),
+        growable: false);
+
+    var index = 0;
+    for (var node in _nodesTree.getInOrderData()) {
+      getDistances(node.id, p: matrix[index++]);
+    }
+
+    for (int i = 0; i < matrix.length; i++) {
+      if (kDebugMode) {
+        print(matrix[i]);
+      }
+    }
+    _predecessorsMatrix = matrix;
+    return matrix;
+  }
+
   void clarkWrightAlgorithm(int centre, double maxCapacity) {
     final a = ClarkWrightAlgorithm(
         centre: startZero ? centre : centre + 1, maxCapacity: maxCapacity);
-    a.calculate();
+    // a.calculate();
   }
 
   /// @param from       Zaciatocny Vrchol
   /// @param to         Koncovy vrchol
   /// @param postupnost Ak true, tak sa zobrazi aj postupnost trasy
   void printDistance(int from, int to, bool postupnost) async {
-    final d = getDistances(from);
+    List<int> p =
+        List.generate(_nodesTree.getSize(), (_) => -1, growable: false);
+    final d = getDistances(from, p: p);
     if (kDebugMode) {
-      print("$from -> $to, Dlzka: ${d[to]}");
+      print("$from -> $to, Dlzka: ${d[startZero ? to : to - 1]}");
+    }
+
+    if (postupnost) {
+      if (kDebugMode) {
+        print(
+            "$from -> $to, Dlzka: ${d[startZero ? to : to - 1]}, Postupnost: ");
+      }
+      var text = to.toString();
+      int tempNode = p[startZero ? to : to - 1];
+      while (tempNode != -1) {
+        if (kDebugMode) {
+          text += " <- " + (startZero ? tempNode : tempNode + 1).toString();
+        }
+        tempNode = p[tempNode];
+      }
+      if (kDebugMode) {
+        print(text);
+      }
+    } else {
+      if (kDebugMode) {
+        print("$from -> $to, Dlzka: ${d[startZero ? to : to - 1]}");
+      }
     }
   }
 
@@ -313,29 +368,8 @@ class Application with ChangeNotifier {
 
   void test() {
     clarkWrightAlgorithm(1, 20);
-  }
-
-  void test2() {
-    var max = double.minPositive;
-    var max2 = double.minPositive;
-    TTTree<num, Node> thee = TTTree();
-    for (int i = 0; i < 1000; i++) {
-      final node = Node(id: Random().nextInt(5000));
-      if (node.id > max) {
-        max2 = max;
-        max = node.id * 1.0;
-      }
-      if (node.id > max2 && node.id < max) {
-        max2 = node.id * 1.0;
-      }
-      thee.add(node);
-    }
-    print(max);
-    print(max2);
-    print('---');
-    print(thee.getMaxData().id);
-    thee.removeMaxData();
-    print(thee.getMaxData().id);
+    // printDistance(1, 9, true);
+    // predecessorsMatrix;
   }
 
   Future<FileResult> loadData(String path) async {
@@ -503,6 +537,7 @@ class Application with ChangeNotifier {
           if (nodeFrom != null && nodeTo != null) {
             length = sqrt(pow((nodeFrom.lon - nodeTo.lon), 2) +
                 pow((nodeFrom.lat - nodeTo.lat), 2));
+            length /= 10; //TODO: Divide because of test network format
           }
         }
 
