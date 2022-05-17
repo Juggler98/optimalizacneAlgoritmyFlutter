@@ -316,43 +316,53 @@ class Application with ChangeNotifier {
     }
 
     final intInStr = RegExp(r'\d+\.?\d*');
-    for (int i = 0; i < nodesVecLines.length; i = i + 2) {
-      var line = nodesVecLines[i];
-      var data = line.split(' ');
-      int id = int.parse(data.first);
+    try {
+      for (int i = 0; i < nodesVecLines.length; i = i + 2) {
+        var line = nodesVecLines[i];
+        var data = line.split(' ');
+        int id = int.parse(data.first);
 
-      final node = Node(id: id);
-      _nodesTree.add(node);
-      nodesCount++;
+        final node = Node(id: id);
+        _nodesTree.add(node);
+        nodesCount++;
 
-      line = nodesVecLines[i + 1].trim();
-      var data2 = intInStr.allMatches(line);
-      if (data2.length < 2) {
-        loading = false;
-        notifyListeners();
-        if (kDebugMode) {
-          print(FileResult.notCoordinate);
+        line = nodesVecLines[i + 1].trim();
+        var data2 = intInStr.allMatches(line);
+        if (data2.length < 2) {
+          loading = false;
+          notifyListeners();
+          if (kDebugMode) {
+            print(FileResult.notCoordinate);
+          }
+          return FileResult.notCoordinate;
         }
-        return FileResult.notCoordinate;
+        double lon = double.parse(data2.first.group(0).toString());
+        double lat = double.parse(data2.elementAt(1).group(0).toString());
+
+        node.lat = lat;
+        node.lon = lon;
+
+        if (nodesDataFileExist &&
+            nodesVecLines.length / 2 == nodesDataLines.length) {
+          final line = nodesDataLines[i ~/ 2];
+          final data = line.split(' ');
+          node.type = NodeType.values.elementAt(int.parse(data.elementAt(1)));
+          if (double.parse(data.elementAt(2)) >= 0) {
+            node.capacity = double.parse(data.elementAt(2));
+          }
+          if (data.length > 3) {
+            node.name = data.elementAt(3);
+          }
+        }
       }
-      double lon = double.parse(data2.first.group(0).toString());
-      double lat = double.parse(data2.elementAt(1).group(0).toString());
-
-      node.lat = lat;
-      node.lon = lon;
-
-      if (nodesDataFileExist &&
-          nodesVecLines.length / 2 == nodesDataLines.length) {
-        final line = nodesDataLines[i ~/ 2];
-        final data = line.split(' ');
-        node.type = NodeType.values.elementAt(int.parse(data.elementAt(1)));
-        if (double.parse(data.elementAt(2)) >= 0) {
-          node.capacity = double.parse(data.elementAt(2));
-        }
-        if (data.length > 3) {
-          node.name = data.elementAt(3);
-        }
+    } catch (e) {
+      loading = false;
+      notifyListeners();
+      if (kDebugMode) {
+        print(e);
+        print(FileResult.nodeFileFormat);
       }
+      return FileResult.nodeFileFormat;
     }
 
     if (kDebugMode) {

@@ -6,4 +6,5 @@ enum FileResult {
   nodeIdCountCoordinate,
   notIncident,
   notCoordinate,
+  nodeFileFormat,
 }

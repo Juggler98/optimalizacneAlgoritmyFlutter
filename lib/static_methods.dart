@@ -26,17 +26,19 @@ class StaticMethods {
   static String _getFileResultString(FileResult type) {
     switch (type) {
       case FileResult.fileNotExist:
-        return 'Jeden zo súborov neexistuje';
+        return 'Jeden zo súborov neexistuje. Pozri Info k súborom.';
       case FileResult.idIsNotId2:
-        return 'V súbore edges_incid by malo byť na každom riadku rovnaké ID ako v edges.atr (ak hrana nemá dĺžku nastav jej -1)';
+        return 'V súbore edges_incid by malo byť na každom riadku rovnaké ID ako v edges.atr (ak hrana nemá dĺžku nastav jej -1). Pozri Info k súborom.';
       case FileResult.notIncident:
-        return 'Jednej z hrán chýba vrchol';
+        return 'Jednej z hrán chýba vrchol. Pozri Info k súborom.';
       case FileResult.notCoordinate:
-        return 'Jeden z vrcholov nemá súradnicu';
+        return 'Jeden z vrcholov nemá súradnicu. Pozri Info k súborom.';
       case FileResult.incidentCountLength:
-        return 'Súbor edges_incid.txt by mal mať rovnaký počet riadkov ako edges.atr (ak hrana nemá dĺžku nastav jej -1)';
+        return 'Súbor edges_incid.txt by mal mať rovnaký počet riadkov ako edges.atr (ak hrana nemá dĺžku nastav jej -1). Alebo je zlý formát. Pozri Info k súborom.';
       case FileResult.nodeIdCountCoordinate:
-        return 'Súbor nodes.atr by mal mať rovnaký počet riadkov ako nodes.atr (skús vymazať celý súbor nodes.atr)';
+        return 'Súbor nodes.atr by mal mať rovnaký počet riadkov ako nodes.atr (skús vymazať celý súbor nodes.atr). Pozri Info k súborom.';
+      case FileResult.nodeFileFormat:
+        return 'Súbor s vrcholmi má zlý formát. Pozri Info k súborom.';
       case FileResult.correct:
         return 'correct';
       default:
