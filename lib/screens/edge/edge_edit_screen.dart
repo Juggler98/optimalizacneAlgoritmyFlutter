@@ -72,19 +72,19 @@ class _EdgeEditScreenState extends State<EdgeEditScreen> {
     if (widget.edge != null) {
       _app.editEdge(widget.edge, _length, _active);
       StaticMethods.showSnackBar('Hrana bola upravená', context, Colors.green,
-          duration: 4);
+          duration: 2);
       Navigator.of(context).pop(true);
     } else {
       if (_app.getNode(_from) == null) {
         StaticMethods.showSnackBar(
             'Uzol \'Od\' neexistuje', context, Colors.red,
-            duration: 4);
+            duration: 2);
         return;
       }
       if (_app.getNode(_to) == null) {
         StaticMethods.showSnackBar(
             'Uzol \'Do\' neexistuje', context, Colors.red,
-            duration: 4);
+            duration: 2);
         return;
       }
       if (_length == null) {
@@ -96,11 +96,11 @@ class _EdgeEditScreenState extends State<EdgeEditScreen> {
           _length /= 10; //TODO: Divide because of test network format
         }
       }
-      final edge =
-          Edge(id: _app.edgesCountSequence, from: _from, to: _to, length: _length);
+      final edge = Edge(
+          id: _app.edgesCountSequence, from: _from, to: _to, length: _length);
       _app.addEdge(edge);
       StaticMethods.showSnackBar('Hrana bola vytvorená', context, Colors.green,
-          duration: 4);
+          duration: 2);
       _clearData();
     }
   }

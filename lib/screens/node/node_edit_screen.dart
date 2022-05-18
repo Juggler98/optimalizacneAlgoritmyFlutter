@@ -93,7 +93,7 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
     if (widget.node != null) {
       _app.editNode(widget.node, _name, _capacity, _type);
       StaticMethods.showSnackBar('Uzol bol upravený', context, Colors.green,
-          duration: 4);
+          duration: 2);
       Navigator.of(context).pop(true);
     } else {
       final node = Node(
@@ -107,7 +107,7 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
       );
       _app.addNode(node);
       StaticMethods.showSnackBar('Uzol bol vytvorený', context, Colors.green,
-          duration: 4);
+          duration: 2);
       _clearData();
     }
   }

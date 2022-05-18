@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/application.dart';
-import 'package:optimalizacne_algoritmy/constants.dart';
+import 'package:optimalizacne_algoritmy/models/node_type.dart';
+import 'package:optimalizacne_algoritmy/screens/settings_screen.dart';
 import 'package:optimalizacne_algoritmy/static_methods.dart';
 import 'package:optimalizacne_algoritmy/screens/edge/edge_isolated_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/node/node_isolated_screen.dart';
+import 'package:optimalizacne_algoritmy/widgets/capacity_dialog.dart';
+
+import 'models/node.dart';
+import 'screens/clarke_wright/cw_routes_screen.dart';
 
 class MainDrawer extends StatelessWidget {
   final Application _app = Application();
@@ -39,12 +44,53 @@ class MainDrawer extends StatelessWidget {
               ),
               title: const Text('Klasický Clarke-Wrightov algoritmus'),
               onTap: () {
-                Navigator.of(context).pop();
-                // Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (ctx) => GeneratorScreen(),
-                //   ),
-                // );
+                Node centre;
+                bool eachIsCostumer = true;
+                for (var node in _app.allNodes) {
+                  if (node.type == NodeType.primarnyZdroj) {
+                    centre = node;
+                    break;
+                  }
+                }
+                for (var node in _app.allNodes) {
+                  if (node.type != NodeType.zakaznik && node != centre) {
+                    eachIsCostumer = false;
+                    break;
+                  }
+                }
+                if (centre == null) {
+                  StaticMethods.showSnackBar(
+                      'Nie je zvolené žiadne stredisko (Primárny zdroj)',
+                      context,
+                      Colors.red,
+                      duration: 4);
+                  return;
+                }
+
+                if (!eachIsCostumer) {
+                  StaticMethods.showSnackBar(
+                      'Všetky vrcholy okrem strediska by mali byť typu zákazník. V nastaveniach môžeš inicializovať uzly hromadne.',
+                      context,
+                      Colors.red,
+                      duration: 4);
+                  return;
+                }
+                showDialog(
+                  context: context,
+                  builder: (ctx) => ChangeCapacityDialog(
+                      context, ctx, true, 'Kapacita vozidla'),
+                ).then((value) {
+                  if (value != null) {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (ctx) => RoutesScreen(
+                            centre: centre.id,
+                            vehicleCapacity: double.parse(value)),
+                      ),
+                    );
+                  }
+                });
               },
             ),
             const Divider(),
@@ -101,43 +147,6 @@ class MainDrawer extends StatelessWidget {
                     builder: (ctx) => EdgeIsolatedScreen(),
                   ),
                 );
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(
-                Icons.delete_forever_outlined,
-                color: Colors.black54,
-              ),
-              title: const Text('Vymaž všetko'),
-              onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (ctx) {
-                      return AlertDialog(
-                        title: const Text('Určite?'),
-                        content:
-                            const Text('Určite chceš vymazať všetky dáta?'),
-                        actions: [
-                          TextButton(
-                            child: const Text("Vymazať"),
-                            onPressed: () {
-                              _app.removeAllData();
-                              StaticMethods.showSnackBar(
-                                  'Dáta boli vymazané', context, Colors.green);
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          TextButton(
-                            child: const Text("Zrušiť"),
-                            onPressed: () {
-                              Navigator.of(context).pop(true);
-                            },
-                          ),
-                        ],
-                      );
-                    });
               },
             ),
             const Divider(),
@@ -207,20 +216,16 @@ class MainDrawer extends StatelessWidget {
             const Divider(),
             ListTile(
               leading: const Icon(
-                Icons.info_outline,
+                Icons.settings_outlined,
                 color: Colors.black54,
               ),
-              title: const Text('Info'),
+              title: const Text('Nastavenia'),
               onTap: () {
-                showAboutDialog(
-                  context: context,
-                  applicationIcon: Image.asset(
-                    'assets/icon.png',
-                    width: 48,
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (ctx) => SettingsScreen(),
                   ),
-                  applicationName: 'Optimalizačné algoritmy',
-                  applicationVersion: version,
-                  applicationLegalese: '© 2022 Adam Belianský',
                 );
               },
             ),

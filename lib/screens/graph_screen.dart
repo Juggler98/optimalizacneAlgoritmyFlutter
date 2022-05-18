@@ -22,10 +22,6 @@ class _GraphScreenState extends State<GraphScreen> {
   void initState() {
     super.initState();
 
-    // final h = Node.Id(8);
-    // graph.addEdge(a, b, paint: Paint()..color = Colors.red);
-    // graph.addEdge(g, c);
-
     TTTree<num, Node> graphicsNodes = TTTree();
 
     final intervalNodes =
@@ -53,7 +49,12 @@ class _GraphScreenState extends State<GraphScreen> {
     }
 
     setState(() {
-      builder = FruchtermanReingoldAlgorithm(iterations: 1000);
+      builder = FruchtermanReingoldAlgorithm(
+        iterations: 1000,
+        attractionRate: 0.12,
+        graphWidth: 300,
+        graphHeight: 300,
+      );
     });
   }
 

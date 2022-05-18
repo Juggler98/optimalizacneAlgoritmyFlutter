@@ -42,8 +42,7 @@ class NumberTextField extends StatelessWidget {
                       return oldValue;
                     }
                   }),
-                if (!isDecimal)
-                  FilteringTextInputFormatter.digitsOnly
+                if (!isDecimal) FilteringTextInputFormatter.digitsOnly
               ],
               decoration: InputDecoration(
                 labelText: placeholder,

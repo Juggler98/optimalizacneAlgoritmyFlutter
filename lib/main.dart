@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/screens/tabs_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:window_size/window_size.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart' as sett;
 
 import 'application.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (Platform.isWindows) {
@@ -15,6 +16,8 @@ void main() {
     setWindowMinSize(const Size(600, 500));
     setWindowMaxSize(Size.infinite);
   }
+
+  await sett.Settings.init();
 
   runApp(const MyApp());
 }

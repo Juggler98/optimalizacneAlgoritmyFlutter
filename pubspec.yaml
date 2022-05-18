@@ -37,6 +37,7 @@ dependencies:
   fluttertoast: ^8.0.9
   shared_preferences: ^2.0.15
   font_awesome_flutter: ^10.1.0
+  flutter_settings_screens: ^0.3.2-null-safety
   window_size:
     git:
       url: https://github.com/google/flutter-desktop-embedding.git

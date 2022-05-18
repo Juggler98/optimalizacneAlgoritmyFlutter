@@ -97,6 +97,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.6"
+  flutter_settings_screens:
+    dependency: "direct main"
+    description:
+      name: flutter_settings_screens
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.2-null-safety"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -226,6 +233,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.5"
+  pedantic:
+    dependency: transitive
+    description:
+      name: pedantic
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.11.1"
   platform:
     dependency: transitive
     description:

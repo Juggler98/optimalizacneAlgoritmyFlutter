@@ -5,22 +5,29 @@ import 'package:optimalizacne_algoritmy/models/clarke_wright/saving.dart';
 import '../node.dart';
 import '../two_three_tree/two_three_tree.dart';
 
-class ClarkWrightAlgorithm {
+class ClarkeWrightAlgorithm {
   final int centre;
-  final double maxCapacity;
+  final double vehicleCapacity;
 
   final app = Application();
 
   TTTree<num, Saving> _savings = TTTree();
   List<List<Node>> _routes = [];
+  List<List<int>> _routesWithCenter;
+  List<List<int>> _tracks;
 
-  ClarkWrightAlgorithm({@required this.centre, this.maxCapacity}) {
+  ClarkeWrightAlgorithm({
+    @required this.centre,
+    @required this.vehicleCapacity,
+  }) {
     calculate();
   }
 
   void _init() {
     _savings = TTTree();
     _routes = [];
+    _tracks = null;
+    _routesWithCenter = null;
     var index = 0;
     for (var node in app.allNodes) {
       if (node.id != centre) {
@@ -33,19 +40,16 @@ class ClarkWrightAlgorithm {
 
   void calculate() {
     _init();
-    if (app.nodesCount < -1) {
+    if (app.nodesCount < 10000) {
       for (int i = 0; i < app.distanceMatrix.length; i++) {
         for (int j = 0; j < app.distanceMatrix[0].length; j++) {
-          if (i != j) {
-            final centreNode = app.getNode(centre);
+          final centreNode = app.getNode(centre);
+          if (i != j && i != centreNode.position && j != centreNode.position) {
             final saving = app.distanceMatrix[centreNode.position][i] +
                 app.distanceMatrix[centreNode.position][j] -
                 app.distanceMatrix[i][j];
             if (saving > 0) {
-              _savings.add(Saving(
-                  from: i,
-                  to: j,
-                  saving: saving));
+              _savings.add(Saving(from: i, to: j, saving: saving));
             }
           }
         }
@@ -53,15 +57,13 @@ class ClarkWrightAlgorithm {
     } else {
       for (int i = 0; i < app.nodesCount; i++) {
         for (int j = 0; j < app.nodesCount; j++) {
-          if (i != j) {
+          final centreNode = app.getNode(centre);
+          if (i != j && i != centreNode.position && j != centreNode.position) {
             final mI = app.getDistances(app.getNodeFromPosition(i).id);
             final mCentre = app.getDistances(centre);
             final saving = mCentre[i] + mCentre[j] - mI[j];
             if (saving > 0) {
-              _savings.add(Saving(
-                  from: i,
-                  to: j,
-                  saving: saving));
+              _savings.add(Saving(from: i, to: j, saving: saving));
             }
           }
         }
@@ -71,19 +73,16 @@ class ClarkWrightAlgorithm {
     while (_savings.getSize() != 0) {
       final sav = _savings.removeMaxData();
       if (kDebugMode) {
-        print(sav);
+        //print(sav);
       }
       _join(sav);
     }
     routes.removeWhere((list) => list.isEmpty);
-    printRoutes();
+    //printRoutes();
   }
 
   //Try to join nodes to one route
   void _join(Saving saving) {
-    print('------------');
-    print(saving);
-    printRoutes();
     final nodeFrom = app.getNodeFromPosition(saving.from);
     final nodeTo = app.getNodeFromPosition(saving.to);
     //Ak uz su uzly v jednej trase koncime
@@ -92,8 +91,8 @@ class ClarkWrightAlgorithm {
     }
     final routeFrom = _routes[nodeFrom.routesPosition];
     final routeTo = _routes[nodeTo.routesPosition];
-    final capacity = _getCapacity(routeFrom) + _getCapacity(routeTo);
-    if (capacity > maxCapacity) {
+    final necessity = _getNecessity(routeFrom) + _getNecessity(routeTo);
+    if (necessity > vehicleCapacity) {
       return;
     }
     //Check if node is on start or end of route
@@ -128,7 +127,7 @@ class ClarkWrightAlgorithm {
     }
   }
 
-  double _getCapacity(List<Node> nodes) {
+  double _getNecessity(List<Node> nodes) {
     var capacity = 0.0;
     for (var node in nodes) {
       capacity += node.capacity;
@@ -138,6 +137,54 @@ class ClarkWrightAlgorithm {
 
   List<List<Node>> get routes {
     return _routes;
+  }
+
+  List<List<int>> get routesWithCenter {
+    if (_routesWithCenter != null) {
+      return _routesWithCenter;
+    }
+    _routesWithCenter = List.generate(routes.length, (index) => []);
+    int index = 0;
+    for (var route in routes) {
+      _routesWithCenter[index].add(centre);
+      for (var node in route) {
+        _routesWithCenter[index].add(node.id);
+      }
+      _routesWithCenter[index].add(centre);
+      index++;
+    }
+    return _routesWithCenter;
+  }
+
+  List<List<int>> get tracks {
+    if (_tracks != null) {
+      return _tracks;
+    }
+    _tracks = List.generate(routes.length, (index) => []);
+    int index = 0;
+    for (var route in routes) {
+      final centerNode = app.getNode(centre);
+      var track = app.getTrack(centerNode.id, route[0].id).reversed;
+      for (var t in track) {
+        tracks[index].add(t);
+      }
+      for (int j = 0; j < route.length - 1; j++) {
+        final track = app.getTrack(route[j].id, route[j + 1].id).reversed;
+        for (var t in track) {
+          if (t != tracks[index].last) {
+            tracks[index].add(t);
+          }
+        }
+      }
+      track = app.getTrack(route[route.length - 1].id, centerNode.id).reversed;
+      for (var t in track) {
+        if (t != tracks[index].last) {
+          tracks[index].add(t);
+        }
+      }
+      index++;
+    }
+    return _tracks;
   }
 
   void printRoutes() {

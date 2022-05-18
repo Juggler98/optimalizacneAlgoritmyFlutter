@@ -3,13 +3,11 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:optimalizacne_algoritmy/models/file_result.dart';
 import 'package:optimalizacne_algoritmy/models/two_three_tree/two_three_tree.dart';
 import 'package:optimalizacne_algoritmy/models/node_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'models/clarke_wright/clark_wright_algorithm.dart';
 import 'models/edge.dart';
 import 'models/node.dart';
 
@@ -54,7 +52,7 @@ class Application with ChangeNotifier {
 
     await loadData(path);
 
-    test();
+    //test();
   }
 
   void removeAllData() {
@@ -218,6 +216,25 @@ class Application with ChangeNotifier {
     return _edgesTree.getSize();
   }
 
+  void update() {
+    notifyListeners();
+  }
+
+  void setCapacity(double capacity) {
+    for (var node in allNodes) {
+      node.capacity = capacity;
+    }
+    notifyListeners();
+  }
+
+  void setRandomCapacity(int bound) {
+    final random = Random();
+    for (var node in allNodes) {
+      node.capacity = random.nextInt(bound) * 1.0;
+    }
+    notifyListeners();
+  }
+
   void printEdgesForNodes(int pocet) {
     if (pocet == -1) {
       pocet = nodesCount;
@@ -247,7 +264,6 @@ class Application with ChangeNotifier {
         growable: false);
 
     final nodeFrom = getNode(from);
-    print(nodeFrom);
     d[nodeFrom.position] = 0;
 
     Queue<int> queue = Queue();
@@ -307,7 +323,7 @@ class Application with ChangeNotifier {
 
     for (int i = 0; i < matrix.length; i++) {
       if (kDebugMode) {
-        print(matrix[i]);
+        //print(matrix[i]);
       }
     }
     _distanceMatrix = matrix;
@@ -337,11 +353,6 @@ class Application with ChangeNotifier {
     return matrix;
   }
 
-  void clarkWrightAlgorithm(int centre, double maxCapacity) {
-    final a = ClarkWrightAlgorithm(centre: centre, maxCapacity: maxCapacity);
-    // a.calculate();
-  }
-
   /// @param from       Zaciatocny Vrchol
   /// @param to         Koncovy vrchol
   /// @param postupnost Ak true, tak sa zobrazi aj postupnost trasy
@@ -353,8 +364,7 @@ class Application with ChangeNotifier {
 
     if (postupnost) {
       if (kDebugMode) {
-        print(
-            "$from -> $to, Dlzka: ${d[nodeTo.position]}, Postupnost: ");
+        print("$from -> $to, Dlzka: ${d[nodeTo.position]}, Postupnost: ");
       }
       var text = to.toString();
       int tempNode = p[nodeTo.position];
@@ -375,6 +385,22 @@ class Application with ChangeNotifier {
     }
   }
 
+  List<int> getTrack(int from, int to) {
+    List<int> p =
+        List.generate(_nodesTree.getSize(), (_) => -1, growable: false);
+    List<int> nodes = [];
+    getDistances(from, p: p);
+    final nodeTo = getNode(to);
+    nodes.add(nodeTo.id);
+    var tempNode = p[nodeTo.position];
+    while (tempNode != -1) {
+      final node = getNodeFromPosition(tempNode);
+      nodes.add(node.id);
+      tempNode = p[tempNode];
+    }
+    return nodes;
+  }
+
   void printAllDistances(int from, {int count}) async {
     var d = getDistances(from);
     if (kDebugMode) {
@@ -390,13 +416,7 @@ class Application with ChangeNotifier {
     }
   }
 
-  void test() {
-    final a = ClarkWrightAlgorithm(centre: 2, maxCapacity: 20);
-
-    //clarkWrightAlgorithm(2, 20);
-    printDistance(1, 6, true);
-    // predecessorsMatrix;
-  }
+  void test() {}
 
   Future<FileResult> loadData(String path) async {
     loading = true;
@@ -588,8 +608,7 @@ class Application with ChangeNotifier {
     notifyListeners();
 
     //vypisHranyPreVrcholy(-1);
-
-    // printDistance(0, 1, false);
+    //printDistance(1, 6, false);
 
     return FileResult.correct;
   }
