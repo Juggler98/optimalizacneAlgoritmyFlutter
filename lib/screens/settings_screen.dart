@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_settings_screens/flutter_settings_screens.dart' as sett;
 import 'package:flutter/material.dart';
 import 'package:optimalizacne_algoritmy/models/node_type.dart';
@@ -50,7 +52,7 @@ class SettingsScreen extends StatelessWidget {
                 Icons.crop,
                 color: Colors.grey,
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: Platform.isWindows ? 12 : 16),
               Expanded(
                 child: sett.RadioModalSettingsTile<int>(
                   title: 'Nastaviť typ pre všetky uzly',

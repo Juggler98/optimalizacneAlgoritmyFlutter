@@ -1,1 +1,46 @@
-45h
+45 hrs over 8 days
+
+Files
+13 hrs 55 mins	...algoritmy/lib/application.dart
+2 hrs 54 mins	...lib/screens/graph_screen2.dart
+2 hrs 19 mins	...lib/screens/graph_screen.dart
+2 hrs 12 mins	...algoritmy/lib/main_drawer.dart
+2 hrs 10 mins	...algoritmy/lib/directed.dart
+1 hr 43 mins	...clark_wright_algorithm.dart
+1 hr 22 mins	...lib/static_methods.dart
+1 hr 8 mins	...lib/screens/tabs_screen.dart
+1 hr	...screens/settings_screen.dart
+57 mins	...clarke_wright/routes.dart
+47 mins	...edge_detail_screen.dart
+44 mins	...algoritmy/lib/main.dart
+41 mins	...node/node_new_screen.dart
+39 mins	...lib/graph_screen.dart
+37 mins	...node/node_edit_screen.dart
+35 mins	...lib/widgets/node_item.dart
+34 mins	...algoritmy/lib/models/node.dart
+33 mins	...edge/edge_edit_screen.dart
+30 mins	...node_detail_screen.dart
+30 mins	...algoritmy/lib/models/edge.dart
+27 mins	...algoritmy/pubspec.yaml
+26 mins	...lib/widgets/edge_item.dart
+22 mins	...two_three_tree.dart
+22 mins	...node/node_detail_screen.dart
+22 mins	...twoThreeTree/TTTree.dart
+20 mins	...lib/widgets/node_dropdown.dart
+20 mins	...fields/number_textfield.dart
+19 mins	...lib/screens/nodes_screen.dart
+17 mins	...widgets/capacity_dialog.dart
+17 mins	...dart
+17 mins	...screens/edge/edges_screen.dart
+16 mins	...edge/edge_detail_screen.dart
+15 mins	...edge/edge_new_screen.dart
+14 mins	...screens/node/nodes_screen.dart
+14 mins	...plugin_registrant.dart
+13 mins	...wright/cw_graph_screen.dart
+13 mins	...lib/widgets/cw_route_item.dart
+12 mins	...algoritmy/test_nodes.vec
+12 mins	...lib/models/saving.dart
+12 mins	...lib/widgets/route_item.dart
+11 mins	...screens/cw_routes_screen.dart
+10 mins	...lib/layer_graphview.dart
+
