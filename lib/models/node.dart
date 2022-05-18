@@ -17,7 +17,7 @@ class Node implements Comparable<Node> {
     @required this.id,
     this.name,
     this.type = NodeType.nespecifikovane,
-    this.capacity = 5,
+    this.capacity,
     this.edge,
     this.lat,
     this.lon,

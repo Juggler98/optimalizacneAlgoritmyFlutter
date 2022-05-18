@@ -79,7 +79,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           const Divider(),
           buildListTile(
-            'Nastaviť kapacitu všetkým uzlom',
+            'Nastaviť kapacitu/požiadavku všetkým uzlom',
             Icons.crop_square,
             () {
               showDialog(
@@ -95,7 +95,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           const Divider(),
           buildListTile(
-            'Nastaviť náhodnu kapacitu všetkým uzlom',
+            'Nastaviť náhodnu kapacitu/požiadavku všetkým uzlom',
             Icons.crop_free,
             () {
               showDialog(

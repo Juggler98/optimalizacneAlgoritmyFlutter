@@ -45,7 +45,8 @@ class MainDrawer extends StatelessWidget {
               title: const Text('Klasický Clarke-Wrightov algoritmus'),
               onTap: () {
                 Node centre;
-                bool eachIsCostumer = true;
+                var eachIsCostumer = true;
+                var eachHasCapacity = true;
                 for (var node in _app.allNodes) {
                   if (node.type == NodeType.primarnyZdroj) {
                     centre = node;
@@ -57,13 +58,17 @@ class MainDrawer extends StatelessWidget {
                     eachIsCostumer = false;
                     break;
                   }
+                  if (node.capacity == null && node != centre) {
+                    eachHasCapacity = false;
+                    break;
+                  }
                 }
                 if (centre == null) {
                   StaticMethods.showSnackBar(
                       'Nie je zvolené žiadne stredisko (Primárny zdroj)',
                       context,
                       Colors.red,
-                      duration: 4);
+                      duration: 6);
                   return;
                 }
 
@@ -72,7 +77,16 @@ class MainDrawer extends StatelessWidget {
                       'Všetky vrcholy okrem strediska by mali byť typu zákazník. V nastaveniach môžeš inicializovať uzly hromadne.',
                       context,
                       Colors.red,
-                      duration: 4);
+                      duration: 8);
+                  return;
+                }
+
+                if (!eachHasCapacity) {
+                  StaticMethods.showSnackBar(
+                      'Všetky zákaznicke vrcholy by mali mať definovanú požiadavku. V nastaveniach môžeš inicializovať uzly hromadne.',
+                      context,
+                      Colors.red,
+                      duration: 8);
                   return;
                 }
                 showDialog(
