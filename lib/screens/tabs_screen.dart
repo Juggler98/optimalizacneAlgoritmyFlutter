@@ -71,7 +71,7 @@ class _TabsScreenState extends State<TabsScreen>
                 StaticMethods.saveData(context);
               }),
           IconButton(
-              icon: const Icon(Icons.upload_outlined),
+              icon: const Icon(Icons.download_outlined),
               padding: EdgeInsets.symmetric(
                   horizontal: Platform.isAndroid ? 0 : 20, vertical: 8),
               tooltip: 'Načítaj z priečinka',

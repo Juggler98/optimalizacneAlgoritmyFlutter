@@ -96,30 +96,6 @@ class MainDrawer extends StatelessWidget {
             const Divider(),
             ListTile(
               leading: const Icon(
-                Icons.upload_outlined,
-                color: Colors.black54,
-              ),
-              title: const Text('Načítaj z priečinka'),
-              onTap: () async {
-                await StaticMethods.loadData(context);
-                Navigator.pop(context);
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(
-                Icons.save_outlined,
-                color: Colors.black54,
-              ),
-              title: const Text('Ulož do priečinka'),
-              onTap: () async {
-                await StaticMethods.saveData(context);
-                Navigator.pop(context);
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(
                 Icons.crop_square,
                 color: Colors.black54,
               ),

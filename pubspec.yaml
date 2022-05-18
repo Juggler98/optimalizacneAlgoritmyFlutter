@@ -29,14 +29,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.4
   graphview: ^1.1.1
-  path_provider: ^2.0.10
   provider: ^6.0.2
   file_picker: ^4.5.1
-  fluttertoast: ^8.0.9
   shared_preferences: ^2.0.15
-  font_awesome_flutter: ^10.1.0
   flutter_settings_screens: ^0.3.2-null-safety
   window_size:
     git:
