@@ -10,6 +10,7 @@ class Node implements Comparable<Node> {
   Edge edge;
   double lat;
   double lon;
+  int position;
   int routesPosition;
 
   Node({
@@ -20,6 +21,7 @@ class Node implements Comparable<Node> {
     this.edge,
     this.lat,
     this.lon,
+    this.position,
     this.routesPosition,
   });
 

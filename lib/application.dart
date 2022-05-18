@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:optimalizacne_algoritmy/models/file_result.dart';
 import 'package:optimalizacne_algoritmy/models/two_three_tree/two_three_tree.dart';
 import 'package:optimalizacne_algoritmy/models/node_type.dart';
@@ -38,11 +39,13 @@ class Application with ChangeNotifier {
   TTTree<num, Node> _nodesTree = TTTree();
   TTTree<num, Edge> _edgesTree = TTTree();
 
+  List<Node> _nodesInOrder;
+  List<Edge> _edgesInOrder;
+
   List<List<double>> _distanceMatrix;
   List<List<int>> _predecessorsMatrix;
 
   var loading = true;
-  var startZero = false;
 
   void _init() async {
     final prefs = await SharedPreferences.getInstance();
@@ -58,6 +61,9 @@ class Application with ChangeNotifier {
     _nodesTree = TTTree();
     _edgesTree = TTTree();
     _distanceMatrix = null;
+    _predecessorsMatrix = null;
+    _nodesInOrder = null;
+    _edgesInOrder = null;
     nodesCountSequence = 1;
     edgesCountSequence = 1;
     notifyListeners();
@@ -67,7 +73,9 @@ class Application with ChangeNotifier {
     loading = true;
     notifyListeners();
 
+    var index = 0;
     for (var node in _nodesTree.getInOrderData()) {
+      node.position = index++;
       node.edge = null;
     }
 
@@ -81,6 +89,11 @@ class Application with ChangeNotifier {
     for (var edge in edges) {
       _initDoprednaHviezda(edge);
     }
+
+    _distanceMatrix = null;
+    _predecessorsMatrix = null;
+    _nodesInOrder = null;
+    _edgesInOrder = null;
 
     loading = false;
     notifyListeners();
@@ -133,6 +146,7 @@ class Application with ChangeNotifier {
 
   void addNode(Node node) {
     _nodesTree.add(node);
+    _nodesInOrder.add(node);
     nodesCountSequence++;
     notifyListeners();
   }
@@ -165,11 +179,23 @@ class Application with ChangeNotifier {
   }
 
   List<Node> get allNodes {
-    return _nodesTree.getInOrderData();
+    if (_nodesInOrder != null) {
+      return _nodesInOrder;
+    }
+    _nodesInOrder = _nodesTree.getInOrderData();
+    return _nodesInOrder;
   }
 
   List<Edge> get allEdges {
-    return _edgesTree.getInOrderData();
+    if (_edgesInOrder != null) {
+      return _edgesInOrder;
+    }
+    _edgesInOrder = _edgesTree.getInOrderData();
+    return _edgesInOrder;
+  }
+
+  Node getNodeFromPosition(int position) {
+    return allNodes.elementAt(position);
   }
 
   List<Node> getIntervalNodes(int start, int end) {
@@ -220,44 +246,44 @@ class Application with ChangeNotifier {
     List<double> d = List.generate(_nodesTree.getSize(), (_) => double.infinity,
         growable: false);
 
-    d[startZero ? from : from - 1] = 0;
+    final nodeFrom = getNode(from);
+    print(nodeFrom);
+    d[nodeFrom.position] = 0;
 
     Queue<int> queue = Queue();
     Queue<int> queue2 = Queue();
 
-    queue.add(from);
+    queue.add(nodeFrom.id);
     // ignore: unused_local_variable
     var pocetVyberani = 0;
     while (queue.isNotEmpty || queue2.isNotEmpty) {
-      int nodeFrom;
+      int nodeFromIndex;
       if (queue2.isNotEmpty) {
-        nodeFrom = queue2.removeFirst();
+        nodeFromIndex = queue2.removeFirst();
       } else {
-        nodeFrom = queue.removeFirst();
+        nodeFromIndex = queue.removeFirst();
       }
       pocetVyberani++;
-      final node = _nodesTree.search(Node(id: nodeFrom));
-      Edge nodeEdge = node.edge;
+      final nodeFrom = getNode(nodeFromIndex);
+      var nodeEdge = nodeFrom.edge;
       while (nodeEdge != null) {
-        int nodeTo = nodeEdge.getTo(nodeFrom);
+        final nodeToIndex = nodeEdge.getTo(nodeFromIndex);
+        final nodeTo = getNode(nodeToIndex);
         if (nodeEdge.active) {
-          if (d[startZero ? nodeFrom : nodeFrom - 1] + nodeEdge.length <
-              d[startZero ? nodeTo : nodeTo - 1]) {
-            double oldValue = d[startZero ? nodeTo : nodeTo - 1];
-            d[startZero ? nodeTo : nodeTo - 1] =
-                d[startZero ? nodeFrom : nodeFrom - 1] + nodeEdge.length;
+          if (d[nodeFrom.position] + nodeEdge.length < d[nodeTo.position]) {
+            final oldValue = d[nodeTo.position];
+            d[nodeTo.position] = d[nodeFrom.position] + nodeEdge.length;
             if (p != null) {
-              p[startZero ? nodeTo : nodeTo - 1] =
-                  startZero ? nodeFrom : nodeFrom - 1;
+              p[nodeTo.position] = nodeFrom.position;
             }
             if (oldValue != double.infinity) {
-              queue2.add(nodeTo);
+              queue2.add(nodeToIndex);
             } else {
-              queue.add(nodeTo);
+              queue.add(nodeToIndex);
             }
           }
         }
-        nodeEdge = nodeEdge.getNextEdge(nodeFrom);
+        nodeEdge = nodeEdge.getNextEdge(nodeFromIndex);
       }
     }
     if (kDebugMode) {
@@ -312,8 +338,7 @@ class Application with ChangeNotifier {
   }
 
   void clarkWrightAlgorithm(int centre, double maxCapacity) {
-    final a = ClarkWrightAlgorithm(
-        centre: startZero ? centre : centre + 1, maxCapacity: maxCapacity);
+    final a = ClarkWrightAlgorithm(centre: centre, maxCapacity: maxCapacity);
     // a.calculate();
   }
 
@@ -324,20 +349,19 @@ class Application with ChangeNotifier {
     List<int> p =
         List.generate(_nodesTree.getSize(), (_) => -1, growable: false);
     final d = getDistances(from, p: p);
-    if (kDebugMode) {
-      print("$from -> $to, Dlzka: ${d[startZero ? to : to - 1]}");
-    }
+    final nodeTo = getNode(to);
 
     if (postupnost) {
       if (kDebugMode) {
         print(
-            "$from -> $to, Dlzka: ${d[startZero ? to : to - 1]}, Postupnost: ");
+            "$from -> $to, Dlzka: ${d[nodeTo.position]}, Postupnost: ");
       }
       var text = to.toString();
-      int tempNode = p[startZero ? to : to - 1];
+      int tempNode = p[nodeTo.position];
       while (tempNode != -1) {
+        final node = getNodeFromPosition(tempNode);
         if (kDebugMode) {
-          text += " <- " + (startZero ? tempNode : tempNode + 1).toString();
+          text += " <- " + (node.id).toString();
         }
         tempNode = p[tempNode];
       }
@@ -346,7 +370,7 @@ class Application with ChangeNotifier {
       }
     } else {
       if (kDebugMode) {
-        print("$from -> $to, Dlzka: ${d[startZero ? to : to - 1]}");
+        print("$from -> $to, Dlzka: ${d[nodeTo.position]}");
       }
     }
   }
@@ -367,8 +391,10 @@ class Application with ChangeNotifier {
   }
 
   void test() {
-    clarkWrightAlgorithm(1, 20);
-    // printDistance(1, 9, true);
+    final a = ClarkWrightAlgorithm(centre: 2, maxCapacity: 20);
+
+    //clarkWrightAlgorithm(2, 20);
+    printDistance(1, 6, true);
     // predecessorsMatrix;
   }
 
@@ -431,11 +457,7 @@ class Application with ChangeNotifier {
         var data = line.split(' ');
         int id = int.parse(data.first);
 
-        if (id == 0) {
-          startZero = true;
-        }
-
-        final node = Node(id: id);
+        final node = Node(id: id, position: nodesCount);
         _nodesTree.add(node);
         nodesCountSequence++;
 

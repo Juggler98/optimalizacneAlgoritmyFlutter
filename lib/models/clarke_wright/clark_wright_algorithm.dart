@@ -33,17 +33,18 @@ class ClarkWrightAlgorithm {
 
   void calculate() {
     _init();
-    if (app.nodesCount < 10000) {
+    if (app.nodesCount < -1) {
       for (int i = 0; i < app.distanceMatrix.length; i++) {
         for (int j = 0; j < app.distanceMatrix[0].length; j++) {
           if (i != j) {
-            final saving = app.distanceMatrix[app.startZero ? centre : centre - 1][i] +
-                app.distanceMatrix[app.startZero ? centre : centre - 1][j] -
+            final centreNode = app.getNode(centre);
+            final saving = app.distanceMatrix[centreNode.position][i] +
+                app.distanceMatrix[centreNode.position][j] -
                 app.distanceMatrix[i][j];
             if (saving > 0) {
               _savings.add(Saving(
-                  from: app.startZero ? i : i + 1,
-                  to: app.startZero ? j : j + 1,
+                  from: i,
+                  to: j,
                   saving: saving));
             }
           }
@@ -53,13 +54,13 @@ class ClarkWrightAlgorithm {
       for (int i = 0; i < app.nodesCount; i++) {
         for (int j = 0; j < app.nodesCount; j++) {
           if (i != j) {
-            final mI = app.getDistances(app.startZero ? i : i + 1);
+            final mI = app.getDistances(app.getNodeFromPosition(i).id);
             final mCentre = app.getDistances(centre);
             final saving = mCentre[i] + mCentre[j] - mI[j];
             if (saving > 0) {
               _savings.add(Saving(
-                  from: app.startZero ? i : i + 1,
-                  to: app.startZero ? j : j + 1,
+                  from: i,
+                  to: j,
                   saving: saving));
             }
           }
@@ -80,8 +81,11 @@ class ClarkWrightAlgorithm {
 
   //Try to join nodes to one route
   void _join(Saving saving) {
-    final nodeFrom = app.getNode(saving.from);
-    final nodeTo = app.getNode(saving.to);
+    print('------------');
+    print(saving);
+    printRoutes();
+    final nodeFrom = app.getNodeFromPosition(saving.from);
+    final nodeTo = app.getNodeFromPosition(saving.to);
     //Ak uz su uzly v jednej trase koncime
     if (nodeFrom.routesPosition == nodeTo.routesPosition) {
       return;

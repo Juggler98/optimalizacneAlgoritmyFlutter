@@ -103,6 +103,7 @@ class _NodeEditScreenState extends State<NodeEditScreen> {
         capacity: _capacity,
         type: _type,
         name: _name,
+        position: _app.nodesCount,
       );
       _app.addNode(node);
       StaticMethods.showSnackBar('Uzol bol vytvorený', context, Colors.green,

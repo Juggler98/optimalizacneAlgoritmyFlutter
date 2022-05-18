@@ -8,6 +8,7 @@ import 'package:optimalizacne_algoritmy/screens/node/node_edit_screen.dart';
 import 'package:optimalizacne_algoritmy/screens/node/nodes_screen.dart';
 import 'package:optimalizacne_algoritmy/static_methods.dart';
 
+import '../application.dart';
 import '../main_drawer.dart';
 
 class TabsScreen extends StatefulWidget {
@@ -75,6 +76,14 @@ class _TabsScreenState extends State<TabsScreen>
               tooltip: 'Načítaj z priečinka',
               onPressed: () {
                 StaticMethods.loadData(context);
+              }),
+          IconButton(
+              icon: const Icon(Icons.add),
+              padding: EdgeInsets.symmetric(horizontal: Platform.isAndroid ? 0 : 20, vertical: 8),
+              tooltip: 'test',
+              onPressed: () {
+                print('----------');
+                Application().test();
               }),
         ],
       ),
