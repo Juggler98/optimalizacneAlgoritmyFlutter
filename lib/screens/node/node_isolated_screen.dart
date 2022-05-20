@@ -3,6 +3,7 @@ import 'package:optimalizacne_algoritmy/widgets/node_item.dart';
 import 'package:provider/provider.dart';
 
 import '../../application.dart';
+import '../../models/edge.dart';
 import '../../models/node.dart';
 
 class NodeIsolatedScreen extends StatelessWidget {
@@ -25,6 +26,19 @@ class NodeIsolatedScreen extends StatelessWidget {
                 List<Node> nodes = [];
                 for (var node in app.allNodes) {
                   if (node.edge == null) {
+                    nodes.add(node);
+                  }
+
+                  var active = false;
+                  var edge = node.edge;
+                  while (edge != null) {
+                    if (edge.active) {
+                      active = true;
+                      break;
+                    }
+                    edge = edge.getNextEdge(node.id);
+                  }
+                  if (!active) {
                     nodes.add(node);
                   }
                 }

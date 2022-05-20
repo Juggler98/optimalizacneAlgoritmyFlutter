@@ -81,10 +81,12 @@ class _ClarkWrightGraphScreenState extends State<ClarkWrightGraphScreen> {
     final node2 = graphicsNodes.search(Node.Id(id2));
     var edge = graphs[index].getEdgeBetween(node1, node2);
     edge ??= graphs[index].getEdgeBetween(node2, node1);
-    edge.paint = Paint()
-      ..color = Colors.green
-      ..strokeWidth = 4
-      ..style = PaintingStyle.stroke;
+    if (edge != null) {
+      edge.paint = Paint()
+        ..color = Colors.green
+        ..strokeWidth = 4
+        ..style = PaintingStyle.stroke;
+    }
   }
 
   @override
