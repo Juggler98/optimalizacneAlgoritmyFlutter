@@ -146,6 +146,8 @@ class Application with ChangeNotifier {
     _nodesTree.add(node);
     _nodesInOrder.add(node);
     nodesCountSequence++;
+    _distanceMatrix = null;
+    _predecessorsMatrix = null;
     notifyListeners();
   }
 
@@ -165,6 +167,8 @@ class Application with ChangeNotifier {
   void editEdge(Edge edge, double length, bool active) {
     edge.length = length ?? 0;
     edge.active = active;
+    _distanceMatrix = null;
+    _predecessorsMatrix = null;
     notifyListeners();
   }
 
@@ -321,11 +325,13 @@ class Application with ChangeNotifier {
       matrix[index++] = getDistances(node.id);
     }
 
-    for (int i = 0; i < matrix.length; i++) {
-      if (kDebugMode) {
-        //print(matrix[i]);
+    if (kDebugMode) {
+      for (int i = 0; i < matrix.length; i++) {
+        print(matrix[i]);
       }
+      print('');
     }
+
     _distanceMatrix = matrix;
     return matrix;
   }
@@ -344,11 +350,13 @@ class Application with ChangeNotifier {
       getDistances(node.id, p: matrix[index++]);
     }
 
-    for (int i = 0; i < matrix.length; i++) {
-      if (kDebugMode) {
+    if (kDebugMode) {
+      for (int i = 0; i < matrix.length; i++) {
         print(matrix[i]);
       }
+      print('');
     }
+
     _predecessorsMatrix = matrix;
     return matrix;
   }
